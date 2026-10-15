@@ -9,7 +9,7 @@ import SwiftUI
 import Combine
 
 @MainActor
-final class NewsCoordinator: ObservableObject {
+final class NewsCoordinator: ObservableObject, NewsRouting {
     @Published var path = NavigationPath()
 
     func openPost(id: String) {

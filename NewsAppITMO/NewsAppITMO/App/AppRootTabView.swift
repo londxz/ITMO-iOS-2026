@@ -11,20 +11,23 @@ struct AppRootTabView: View {
     @ObservedObject var coordinator: AppCoordinator
     let container: AppContainer
     private let screenFactory: ScreenFactory
+    private let newsRepository: any NewsRepository
     
     init(coordinator: AppCoordinator, container: AppContainer) {
         self.coordinator = coordinator
         self.container = container
         self.screenFactory = AppScreenFactory(container: container)
+        self.newsRepository = NewsRepositoryImpl(client: container.httpClient)
     }
     
     var body: some View {
         TabView(selection: $coordinator.selectedTab) {
             
-            // Пример новостей с навигацией
+            // Новости
             NewsCoordinatorView(
                 coordinator: coordinator.newsCoordinator,
-                screenFactory: screenFactory
+                screenFactory: screenFactory,
+                repository: newsRepository
             )
             .tabItem {
                 Label("Новости", systemImage: "newspaper")

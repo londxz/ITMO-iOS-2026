@@ -19,7 +19,8 @@ final class URLSessionHTTPClient: HTTPClient, Sendable {
         self.session = session
     }
 
-    func send<T: Decodable>(_ endpoint: any Endpoint) async throws -> T {
+    @concurrent
+    func send<T: Decodable & Sendable>(_ endpoint: any Endpoint) async throws -> T {
         var components = URLComponents(
             url: configuration.baseURL.appendingPathComponent(endpoint.path),
             resolvingAgainstBaseURL: true
