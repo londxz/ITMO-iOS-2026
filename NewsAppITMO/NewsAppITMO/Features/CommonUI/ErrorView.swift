@@ -19,6 +19,7 @@ struct ErrorView: View {
         } actions: {
             Button("Повторить", action: retry)
                 .buttonStyle(.borderedProminent)
+                .accessibilityIdentifier("error.retry")
         }
     }
 

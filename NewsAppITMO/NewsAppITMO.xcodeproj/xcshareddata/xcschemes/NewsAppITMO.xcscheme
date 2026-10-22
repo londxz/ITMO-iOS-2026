@@ -8,12 +8,18 @@
          <BuildActionEntry buildForTesting="YES" buildForRunning="NO" buildForProfiling="NO" buildForArchiving="NO" buildForAnalyzing="NO">
             <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="A10000000000000000000008" BuildableName="NewsAppITMOTests.xctest" BlueprintName="NewsAppITMOTests" ReferencedContainer="container:NewsAppITMO.xcodeproj"/>
          </BuildActionEntry>
+         <BuildActionEntry buildForTesting="YES" buildForRunning="NO" buildForProfiling="NO" buildForArchiving="NO" buildForAnalyzing="NO">
+            <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="B10000000000000000000008" BuildableName="NewsAppITMOUITests.xctest" BlueprintName="NewsAppITMOUITests" ReferencedContainer="container:NewsAppITMO.xcodeproj"/>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction buildConfiguration="Debug" selectedDebuggerIdentifier="Xcode.DebuggerFoundation.Debugger.LLDB" selectedLauncherIdentifier="Xcode.IDEFoundation.Launcher.LLDB" shouldUseLaunchSchemeArgsEnv="YES">
       <Testables>
          <TestableReference skipped="NO">
             <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="A10000000000000000000008" BuildableName="NewsAppITMOTests.xctest" BlueprintName="NewsAppITMOTests" ReferencedContainer="container:NewsAppITMO.xcodeproj"/>
+         </TestableReference>
+         <TestableReference skipped="NO">
+            <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="B10000000000000000000008" BuildableName="NewsAppITMOUITests.xctest" BlueprintName="NewsAppITMOUITests" ReferencedContainer="container:NewsAppITMO.xcodeproj"/>
          </TestableReference>
       </Testables>
    </TestAction>

@@ -1,56 +1,60 @@
-import Testing
+import XCTest
 @testable import NewsAppITMO
 
 @MainActor
-struct NewsViewModelTests {
-    @Test
-    func firstLoadPublishesHeroAndFreshPosts() async throws {
+final class NewsViewModelTests: XCTestCase {
+    func testFirstLoadPublishesHeroAndFreshPosts() async throws {
         try await withViewModel { sut, repository in
             let hero = makePost("hero")
             let posts = makePage()
-            let task = try #require(sut.send(.onAppear))
-            #expect(sut.state.initialLoad == .loading)
-            #expect(sut.send(.loadMore) == nil)
+            let task = try XCTUnwrap(sut.send(.onAppear))
+            XCTAssertEqual(sut.state.initialLoad, .loading)
+            XCTAssertNil(sut.send(.loadMore))
 
             try await completeFirstPage(repository, hero: hero, posts: posts)
             await task.value
 
-            #expect(sut.state.heroPost == hero)
-            #expect(sut.state.posts == posts)
-            #expect(sut.state.initialLoad == .loaded)
-            #expect(sut.state.currentPage == 1)
-            #expect(sut.state.canLoadMore)
-            #expect(!sut.state.isEmpty)
-            #expect(await repository.requests.count == 2)
+            XCTAssertEqual(sut.state.heroPost, hero)
+            XCTAssertEqual(sut.state.posts, posts)
+            XCTAssertEqual(sut.state.initialLoad, .loaded)
+            XCTAssertEqual(sut.state.currentPage, 1)
+            XCTAssertTrue(sut.state.canLoadMore)
+            XCTAssertFalse(sut.state.isEmpty)
+            await assertRequestCount(2, repository: repository)
         }
     }
 
-    @Test
-    func emptyResponseProducesLoadedEmptyFeed() async throws {
+    func testEmptyResponseProducesLoadedEmptyFeed() async throws {
         try await withViewModel { sut, repository in
             try await load(sut, repository, hero: nil, posts: [])
-            #expect(sut.state.initialLoad == .loaded)
-            #expect(sut.state.isEmpty)
-            #expect(!sut.state.canLoadMore)
-            #expect(sut.send(.loadMore) == nil)
+            XCTAssertEqual(sut.state.initialLoad, .loaded)
+            XCTAssertTrue(sut.state.isEmpty)
+            XCTAssertFalse(sut.state.canLoadMore)
+            XCTAssertNil(sut.send(.loadMore))
         }
     }
 
-    @Test
-    func missingHeroKeepsAllFreshPosts() async throws {
+    func testMissingHeroKeepsAllFreshPosts() async throws {
         try await withViewModel { sut, repository in
             let posts = makePage(count: 3)
             try await load(sut, repository, hero: nil, posts: posts)
-            #expect(sut.state.heroPost == nil)
-            #expect(sut.state.posts == posts)
-            #expect(!sut.state.isEmpty)
+            XCTAssertNil(sut.state.heroPost)
+            XCTAssertEqual(sut.state.posts, posts)
+            XCTAssertFalse(sut.state.isEmpty)
         }
     }
 
-    @Test(arguments: [ControlledNewsRepository.Kind.dayTop, .fresh(page: 1, perPage: 20)])
-    func firstLoadFailureProducesError(failingKind: ControlledNewsRepository.Kind) async throws {
+    func testDayTopFailureProducesError() async throws {
+        try await assertFirstLoadFailure(.dayTop)
+    }
+
+    func testFreshPostsFailureProducesError() async throws {
+        try await assertFirstLoadFailure(.fresh(page: 1, perPage: 20))
+    }
+
+    private func assertFirstLoadFailure(_ failingKind: MockNewsRepository.Kind) async throws {
         try await withViewModel { sut, repository in
-            let task = try #require(sut.send(.onAppear))
+            let task = try XCTUnwrap(sut.send(.onAppear))
             let heroRequest = try await repository.waitForRequest(.dayTop)
             let freshRequest = try await repository.waitForRequest(.fresh(page: 1, perPage: 20))
             if failingKind == .dayTop {
@@ -62,219 +66,220 @@ struct NewsViewModelTests {
             }
             await task.value
 
-            #expect(sut.state.initialLoad == .failed(.networkUnavailable))
-            #expect(sut.state.isEmpty)
-            #expect(sut.send(.loadMore) == nil)
+            XCTAssertEqual(sut.state.initialLoad, .failed(.networkUnavailable))
+            XCTAssertTrue(sut.state.isEmpty)
+            XCTAssertNil(sut.send(.loadMore))
         }
     }
 
-    @Test
-    func repeatedAppearanceDoesNotStartAnotherLoad() async throws {
+    func testRepeatedAppearanceDoesNotStartAnotherLoad() async throws {
         try await withViewModel { sut, repository in
-            let task = try #require(sut.send(.onAppear))
-            #expect(sut.send(.onAppear) == nil)
+            let task = try XCTUnwrap(sut.send(.onAppear))
+            XCTAssertNil(sut.send(.onAppear))
             try await completeFirstPage(repository, posts: makePage())
             await task.value
-            #expect(sut.send(.onAppear) == nil)
-            #expect(await repository.requests.count == 2)
+            XCTAssertNil(sut.send(.onAppear))
+            await assertRequestCount(2, repository: repository)
         }
     }
 
-    @Test
-    func firstPageExcludesHeroAndUsesOriginalPageSizeForPagination() async throws {
+    func testFirstPageExcludesHeroAndUsesOriginalPageSizeForPagination() async throws {
         try await withViewModel { sut, repository in
             let posts = makePage()
             let hero = posts[0]
             try await load(sut, repository, hero: hero, posts: posts)
-            #expect(sut.state.posts == Array(posts.dropFirst()))
-            #expect(sut.state.heroPost == hero)
-            #expect(sut.state.canLoadMore)
+            XCTAssertEqual(sut.state.posts, Array(posts.dropFirst()))
+            XCTAssertEqual(sut.state.heroPost, hero)
+            XCTAssertTrue(sut.state.canLoadMore)
         }
     }
 
-    @Test
-    func paginationAppendsPostsAndAdvancesPage() async throws {
+    func testPaginationAppendsPostsAndAdvancesPage() async throws {
         try await withViewModel { sut, repository in
             let first = makePage()
             let second = makePage("second")
             try await load(sut, repository, posts: first)
-            let task = try #require(sut.send(.loadMore))
-            #expect(sut.state.paginationLoad == .loading)
+            let task = try XCTUnwrap(sut.send(.loadMore))
+            XCTAssertEqual(sut.state.paginationLoad, .loading)
             let request = try await repository.waitForRequest(.fresh(page: 2, perPage: 20))
             try await repository.succeed(request, posts: second)
             await task.value
 
-            #expect(sut.state.posts == first + second)
-            #expect(sut.state.currentPage == 2)
-            #expect(sut.state.paginationLoad == .loaded)
-            #expect(sut.state.canLoadMore)
+            XCTAssertEqual(sut.state.posts, first + second)
+            XCTAssertEqual(sut.state.currentPage, 2)
+            XCTAssertEqual(sut.state.paginationLoad, .loaded)
+            XCTAssertTrue(sut.state.canLoadMore)
 
-            let thirdTask = try #require(sut.send(.loadMore))
+            let thirdTask = try XCTUnwrap(sut.send(.loadMore))
             let thirdRequest = try await repository.waitForRequest(.fresh(page: 3, perPage: 20))
             try await repository.succeed(thirdRequest, posts: [])
             await thirdTask.value
-            #expect(sut.state.currentPage == 3)
-            #expect(sut.state.posts == first + second)
-            #expect(!sut.state.canLoadMore)
-            #expect(sut.send(.loadMore) == nil)
+            XCTAssertEqual(sut.state.currentPage, 3)
+            XCTAssertEqual(sut.state.posts, first + second)
+            XCTAssertFalse(sut.state.canLoadMore)
+            XCTAssertNil(sut.send(.loadMore))
         }
     }
 
-    @Test
-    func paginationRemovesHeroExistingAndWithinPageDuplicates() async throws {
+    func testPaginationRemovesHeroExistingAndWithinPageDuplicates() async throws {
         try await withViewModel { sut, repository in
             let hero = makePost("hero")
             let first = makePage()
             let newPost = makePost("new")
             try await load(sut, repository, hero: hero, posts: first)
-            let task = try #require(sut.send(.loadMore))
+            let task = try XCTUnwrap(sut.send(.loadMore))
             let request = try await repository.waitForRequest(.fresh(page: 2, perPage: 20))
             // A full page with only one new ID must still permit another page.
             let page = [hero, first[0]] + Array(repeating: newPost, count: 18)
             try await repository.succeed(request, posts: page)
             await task.value
 
-            #expect(sut.state.posts == first + [newPost])
-            #expect(sut.state.heroPost == hero)
-            #expect(sut.state.canLoadMore)
+            XCTAssertEqual(sut.state.posts, first + [newPost])
+            XCTAssertEqual(sut.state.heroPost, hero)
+            XCTAssertTrue(sut.state.canLoadMore)
         }
     }
 
-    @Test(arguments: [0, 1, 19])
-    func shortPageStopsPagination(count: Int) async throws {
+    func testEmptyPageStopsPagination() async throws {
+        try await assertShortPageStopsPagination(count: 0)
+    }
+
+    func testSinglePostPageStopsPagination() async throws {
+        try await assertShortPageStopsPagination(count: 1)
+    }
+
+    func testPageBelowLimitStopsPagination() async throws {
+        try await assertShortPageStopsPagination(count: 19)
+    }
+
+    private func assertShortPageStopsPagination(count: Int) async throws {
         try await withViewModel { sut, repository in
             let first = makePage()
             let second = makePage("second", count: count)
             try await load(sut, repository, posts: first)
-            let task = try #require(sut.send(.loadMore))
+            let task = try XCTUnwrap(sut.send(.loadMore))
             let request = try await repository.waitForRequest(.fresh(page: 2, perPage: 20))
             try await repository.succeed(request, posts: second)
             await task.value
-            #expect(sut.state.posts == first + second)
-            #expect(!sut.state.canLoadMore)
-            #expect(sut.send(.loadMore) == nil)
-            #expect(await repository.requests.count == 3)
+            XCTAssertEqual(sut.state.posts, first + second)
+            XCTAssertFalse(sut.state.canLoadMore)
+            XCTAssertNil(sut.send(.loadMore))
+            await assertRequestCount(3, repository: repository)
         }
     }
 
-    @Test
-    func repeatedLoadMoreWhileLoadingIsIgnored() async throws {
+    func testRepeatedLoadMoreWhileLoadingIsIgnored() async throws {
         try await withViewModel { sut, repository in
             try await load(sut, repository, posts: makePage())
-            let task = try #require(sut.send(.loadMore))
+            let task = try XCTUnwrap(sut.send(.loadMore))
             let request = try await repository.waitForRequest(.fresh(page: 2, perPage: 20))
-            #expect(sut.send(.loadMore) == nil)
+            XCTAssertNil(sut.send(.loadMore))
             try await repository.succeed(request, posts: [])
             await task.value
-            #expect(await repository.requests.count == 3)
+            await assertRequestCount(3, repository: repository)
         }
     }
 
-    @Test
-    func paginationFailurePreservesFeedAndRetryUsesSamePage() async throws {
+    func testPaginationFailurePreservesFeedAndRetryUsesSamePage() async throws {
         try await withViewModel { sut, repository in
             let first = makePage()
             try await load(sut, repository, posts: first)
-            let task = try #require(sut.send(.loadMore))
+            let task = try XCTUnwrap(sut.send(.loadMore))
             let request = try await repository.waitForRequest(.fresh(page: 2, perPage: 20))
             try await repository.fail(request, error: NetworkError.serverUnavailable(statusCode: 503))
             await task.value
-            #expect(sut.state.posts == first)
-            #expect(sut.state.currentPage == 1)
-            #expect(sut.state.initialLoad == .loaded)
-            #expect(sut.state.paginationLoad == .failed(.serverUnavailable))
-            #expect(sut.state.canLoadMore)
+            XCTAssertEqual(sut.state.posts, first)
+            XCTAssertEqual(sut.state.currentPage, 1)
+            XCTAssertEqual(sut.state.initialLoad, .loaded)
+            XCTAssertEqual(sut.state.paginationLoad, .failed(.serverUnavailable))
+            XCTAssertTrue(sut.state.canLoadMore)
 
-            let retry = try #require(sut.send(.loadMore))
+            let retry = try XCTUnwrap(sut.send(.loadMore))
             let retryRequest = try await repository.waitForRequest(.fresh(page: 2, perPage: 20), occurrence: 2)
             let second = makePage("second", count: 2)
             try await repository.succeed(retryRequest, posts: second)
             await retry.value
-            #expect(sut.state.posts == first + second)
-            #expect(sut.state.currentPage == 2)
-            #expect(sut.state.paginationLoad == .loaded)
+            XCTAssertEqual(sut.state.posts, first + second)
+            XCTAssertEqual(sut.state.currentPage, 2)
+            XCTAssertEqual(sut.state.paginationLoad, .loaded)
         }
     }
 
-    @Test
-    func refreshReplacesFeedAndResetsPagination() async throws {
+    func testRefreshReplacesFeedAndResetsPagination() async throws {
         try await withViewModel { sut, repository in
             try await load(sut, repository, hero: makePost("old-hero"), posts: makePage())
-            let pagination = try #require(sut.send(.loadMore))
+            let pagination = try XCTUnwrap(sut.send(.loadMore))
             let request = try await repository.waitForRequest(.fresh(page: 2, perPage: 20))
             try await repository.succeed(request, posts: [])
             await pagination.value
-            #expect(sut.state.currentPage == 2)
-            #expect(!sut.state.canLoadMore)
+            XCTAssertEqual(sut.state.currentPage, 2)
+            XCTAssertFalse(sut.state.canLoadMore)
 
             let oldPosts = sut.state.posts
-            let refresh = try #require(sut.send(.refresh))
-            #expect(sut.state.posts == oldPosts)
-            #expect(sut.state.initialLoad == .loaded)
-            #expect(sut.state.paginationLoad == .idle)
-            #expect(sut.send(.loadMore) == nil)
+            let refresh = try XCTUnwrap(sut.send(.refresh))
+            XCTAssertEqual(sut.state.posts, oldPosts)
+            XCTAssertEqual(sut.state.initialLoad, .loaded)
+            XCTAssertEqual(sut.state.paginationLoad, .idle)
+            XCTAssertNil(sut.send(.loadMore))
             let hero = makePost("new-hero")
             let fresh = makePage("refreshed")
             try await completeFirstPage(repository, occurrence: 2, hero: hero, posts: fresh)
             await refresh.value
-            #expect(sut.state.heroPost == hero)
-            #expect(sut.state.posts == fresh)
-            #expect(sut.state.currentPage == 1)
-            #expect(sut.state.canLoadMore)
+            XCTAssertEqual(sut.state.heroPost, hero)
+            XCTAssertEqual(sut.state.posts, fresh)
+            XCTAssertEqual(sut.state.currentPage, 1)
+            XCTAssertTrue(sut.state.canLoadMore)
         }
     }
 
-    @Test
-    func refreshFailureKeepsExistingFeed() async throws {
+    func testRefreshFailureKeepsExistingFeed() async throws {
         try await withViewModel { sut, repository in
             try await load(sut, repository, hero: makePost("hero"), posts: makePage())
             let previous = sut.state
-            let task = try #require(sut.send(.refresh))
+            let task = try XCTUnwrap(sut.send(.refresh))
             let hero = try await repository.waitForRequest(.dayTop, occurrence: 2)
             let fresh = try await repository.waitForRequest(.fresh(page: 1, perPage: 20), occurrence: 2)
             try await repository.fail(hero, error: NetworkError.decoding)
             try await repository.succeed(fresh, posts: makePage("unused"))
             await task.value
-            #expect(sut.state == previous)
+            XCTAssertEqual(sut.state, previous)
 
             // A failed refresh must also release the guard blocking pagination.
-            let pagination = try #require(sut.send(.loadMore))
+            let pagination = try XCTUnwrap(sut.send(.loadMore))
             let next = try await repository.waitForRequest(.fresh(page: 2, perPage: 20))
             try await repository.succeed(next, posts: [])
             await pagination.value
         }
     }
 
-    @Test
-    func refreshRecoversFromInitialFailure() async throws {
+    func testRefreshRecoversFromInitialFailure() async throws {
         try await withViewModel { sut, repository in
-            let initial = try #require(sut.send(.onAppear))
+            let initial = try XCTUnwrap(sut.send(.onAppear))
             let hero = try await repository.waitForRequest(.dayTop)
             let fresh = try await repository.waitForRequest(.fresh(page: 1, perPage: 20))
             try await repository.fail(hero, error: NetworkError.decoding)
             try await repository.succeed(fresh, posts: [])
             await initial.value
-            #expect(sut.state.initialLoad == .failed(.invalidData))
+            XCTAssertEqual(sut.state.initialLoad, .failed(.invalidData))
 
-            let retry = try #require(sut.send(.refresh))
-            #expect(sut.state.initialLoad == .loading)
+            let retry = try XCTUnwrap(sut.send(.refresh))
+            XCTAssertEqual(sut.state.initialLoad, .loading)
             let posts = makePage(count: 2)
             try await completeFirstPage(repository, occurrence: 2, posts: posts)
             await retry.value
-            #expect(sut.state.initialLoad == .loaded)
-            #expect(sut.state.posts == posts)
+            XCTAssertEqual(sut.state.initialLoad, .loaded)
+            XCTAssertEqual(sut.state.posts, posts)
         }
     }
 
-    @Test
-    func refreshCancelsPaginationAndIgnoresItsLateResponse() async throws {
+    func testRefreshCancelsPaginationAndIgnoresItsLateResponse() async throws {
         try await withViewModel { sut, repository in
             try await load(sut, repository, posts: makePage())
-            let pagination = try #require(sut.send(.loadMore))
+            let pagination = try XCTUnwrap(sut.send(.loadMore))
             let oldRequest = try await repository.waitForRequest(.fresh(page: 2, perPage: 20))
-            let refresh = try #require(sut.send(.refresh))
+            let refresh = try XCTUnwrap(sut.send(.refresh))
             try await repository.waitForCancellation(of: oldRequest)
-            #expect(sut.state.paginationLoad == .idle)
+            XCTAssertEqual(sut.state.paginationLoad, .idle)
             let posts = makePage("refreshed")
             try await completeFirstPage(repository, occurrence: 2, posts: posts)
             await refresh.value
@@ -282,17 +287,16 @@ struct NewsViewModelTests {
 
             try await repository.succeed(oldRequest, posts: makePage("stale"))
             await pagination.value
-            #expect(sut.state == refreshedState)
+            XCTAssertEqual(sut.state, refreshedState)
         }
     }
 
-    @Test
-    func newRefreshCancelsPreviousFirstPageAndIgnoresLateResponse() async throws {
+    func testNewRefreshCancelsPreviousFirstPageAndIgnoresLateResponse() async throws {
         try await withViewModel { sut, repository in
-            let initial = try #require(sut.send(.onAppear))
+            let initial = try XCTUnwrap(sut.send(.onAppear))
             let oldHero = try await repository.waitForRequest(.dayTop)
             let oldFresh = try await repository.waitForRequest(.fresh(page: 1, perPage: 20))
-            let refresh = try #require(sut.send(.refresh))
+            let refresh = try XCTUnwrap(sut.send(.refresh))
             try await repository.waitForCancellation(of: oldHero)
             try await repository.waitForCancellation(of: oldFresh)
             try await completeFirstPage(repository, occurrence: 2, hero: makePost("new-hero"), posts: makePage("new"))
@@ -302,44 +306,50 @@ struct NewsViewModelTests {
             try await repository.succeed(oldHero, hero: makePost("stale-hero"))
             try await repository.succeed(oldFresh, posts: makePage("stale"))
             await initial.value
-            #expect(sut.state == refreshedState)
+            XCTAssertEqual(sut.state, refreshedState)
         }
     }
 
-    @Test
-    func disappearanceCancelsFirstLoadAndAllowsLoadingOnReturn() async throws {
+    func testDisappearanceCancelsFirstLoadAndAllowsLoadingOnReturn() async throws {
         try await withViewModel { sut, repository in
-            let initial = try #require(sut.send(.onAppear))
+            let initial = try XCTUnwrap(sut.send(.onAppear))
             let hero = try await repository.waitForRequest(.dayTop)
             let fresh = try await repository.waitForRequest(.fresh(page: 1, perPage: 20))
             sut.send(.onDisappear)
-            #expect(sut.state.initialLoad == .idle)
+            XCTAssertEqual(sut.state.initialLoad, .idle)
             try await repository.waitForCancellation(of: hero)
             try await repository.waitForCancellation(of: fresh)
             try await repository.succeed(hero, hero: makePost("stale"))
             try await repository.succeed(fresh, posts: makePage("stale"))
             await initial.value
-            #expect(sut.state.initialLoad == .idle)
-            #expect(sut.state.isEmpty)
+            XCTAssertEqual(sut.state.initialLoad, .idle)
+            XCTAssertTrue(sut.state.isEmpty)
 
-            let returning = try #require(sut.send(.onAppear))
+            let returning = try XCTUnwrap(sut.send(.onAppear))
             let posts = makePage("returned")
             try await completeFirstPage(repository, occurrence: 2, posts: posts)
             await returning.value
-            #expect(sut.state.initialLoad == .loaded)
-            #expect(sut.state.posts == posts)
+            XCTAssertEqual(sut.state.initialLoad, .loaded)
+            XCTAssertEqual(sut.state.posts, posts)
         }
     }
 
-    @Test(arguments: [true, false])
-    func disappearanceCancelsPaginationWithoutChangingFeed(lateSuccess: Bool) async throws {
+    func testDisappearanceCancelsPaginationAndIgnoresLateSuccess() async throws {
+        try await assertDisappearanceCancelsPagination(lateSuccess: true)
+    }
+
+    func testDisappearanceCancelsPaginationAndIgnoresLateFailure() async throws {
+        try await assertDisappearanceCancelsPagination(lateSuccess: false)
+    }
+
+    private func assertDisappearanceCancelsPagination(lateSuccess: Bool) async throws {
         try await withViewModel { sut, repository in
             try await load(sut, repository, posts: makePage())
             let previous = sut.state
-            let pagination = try #require(sut.send(.loadMore))
+            let pagination = try XCTUnwrap(sut.send(.loadMore))
             let request = try await repository.waitForRequest(.fresh(page: 2, perPage: 20))
             sut.send(.onDisappear)
-            #expect(sut.state == previous)
+            XCTAssertEqual(sut.state, previous)
             try await repository.waitForCancellation(of: request)
             if lateSuccess {
                 try await repository.succeed(request, posts: makePage("stale"))
@@ -347,20 +357,30 @@ struct NewsViewModelTests {
                 try await repository.fail(request, error: NetworkError.cancelled)
             }
             await pagination.value
-            #expect(sut.state == previous)
+            XCTAssertEqual(sut.state, previous)
 
-            let retry = try #require(sut.send(.loadMore))
+            let retry = try XCTUnwrap(sut.send(.loadMore))
             let retryRequest = try await repository.waitForRequest(.fresh(page: 2, perPage: 20), occurrence: 2)
             try await repository.succeed(retryRequest, posts: [])
             await retry.value
-            #expect(sut.state.currentPage == 2)
+            XCTAssertEqual(sut.state.currentPage, 2)
         }
     }
 
+    private func assertRequestCount(
+        _ count: Int,
+        repository: MockNewsRepository,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) async {
+        let requests = await repository.requests
+        XCTAssertEqual(requests.count, count, file: file, line: line)
+    }
+
     private func withViewModel(
-        _ body: @MainActor (NewsViewModel, ControlledNewsRepository) async throws -> Void
+        _ body: @MainActor (NewsViewModel, MockNewsRepository) async throws -> Void
     ) async throws {
-        let repository = ControlledNewsRepository()
+        let repository = MockNewsRepository()
         let sut = NewsViewModel(repository: repository, router: nil)
         do {
             try await body(sut, repository)
@@ -375,17 +395,17 @@ struct NewsViewModelTests {
 
     private func load(
         _ sut: NewsViewModel,
-        _ repository: ControlledNewsRepository,
+        _ repository: MockNewsRepository,
         hero: PostModel? = nil,
         posts: [PostModel]
     ) async throws {
-        let task = try #require(sut.send(.onAppear))
+        let task = try XCTUnwrap(sut.send(.onAppear))
         try await completeFirstPage(repository, hero: hero, posts: posts)
         await task.value
     }
 
     private func completeFirstPage(
-        _ repository: ControlledNewsRepository,
+        _ repository: MockNewsRepository,
         occurrence: Int = 1,
         hero: PostModel? = nil,
         posts: [PostModel]

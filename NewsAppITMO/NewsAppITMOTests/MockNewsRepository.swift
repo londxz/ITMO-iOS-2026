@@ -3,7 +3,7 @@ import Foundation
 
 /// Requests finish only when the test supplies a result. Cancellation is recorded,
 /// but deliberately does not finish a request, so tests can deliver late responses.
-actor ControlledNewsRepository: NewsRepository {
+actor MockNewsRepository: NewsRepository {
     enum Kind: Hashable, Sendable {
         case dayTop
         case fresh(page: Int, perPage: Int)

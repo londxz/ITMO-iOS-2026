@@ -27,6 +27,7 @@ struct NewsView: View {
         switch viewModel.state.initialLoad {
         case .idle, .loading:
             LoadingView()
+                .accessibilityIdentifier("news.loading")
         case .failed(let error):
             ErrorView(error: error) { viewModel.send(.refresh) }
         case .loaded:
@@ -43,6 +44,7 @@ struct NewsView: View {
                         message: "Потяните вниз, чтобы обновить",
                         systemImage: "newspaper"
                     )
+                    .accessibilityIdentifier("news.empty")
                     .containerRelativeFrame(.vertical)
                 }
 
@@ -54,6 +56,7 @@ struct NewsView: View {
                         NewsHeroCardView(post: heroPost)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier("news.hero.\(heroPost.id)")
                     .padding(.horizontal)
                 }
 
@@ -67,6 +70,7 @@ struct NewsView: View {
                             NewsRowView(post: post)
                         }
                         .buttonStyle(.plain)
+                        .accessibilityIdentifier("news.post.\(post.id)")
                         Divider()
                             .padding(.leading)
                     }
@@ -74,6 +78,7 @@ struct NewsView: View {
                 }
             }
         }
+        .accessibilityIdentifier("news.feed")
         .refreshable {
             await viewModel.send(.refresh)?.value
         }
@@ -95,6 +100,7 @@ struct NewsView: View {
                     Button("Не удалось загрузить. Повторить") {
                         viewModel.send(.loadMore)
                     }
+                    .accessibilityIdentifier("news.pagination.retry")
                 } else {
                     ProgressView()
                         .onAppear { viewModel.send(.loadMore) }

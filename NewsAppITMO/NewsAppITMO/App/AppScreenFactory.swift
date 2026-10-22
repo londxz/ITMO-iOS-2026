@@ -24,6 +24,7 @@ final class AppScreenFactory: ScreenFactory {
                     .foregroundStyle(.blue)
                 Text("Детали публикации ID: \(id)")
                     .font(.title2).bold()
+                    .accessibilityIdentifier("post.detail.id")
                 Text("Здесь будет текст статьи и кнопка автора")
                     .foregroundStyle(.secondary)
             }
