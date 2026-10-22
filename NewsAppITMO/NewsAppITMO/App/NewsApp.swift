@@ -10,7 +10,7 @@ import SwiftUI
 @main
 struct NewsApp: App {
     @StateObject private var coordinator = AppCoordinator()
-    private let container = AppContainer.makeForLaunch()
+    private let container = AppContainer()
     
     var body: some Scene {
         WindowGroup {

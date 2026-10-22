@@ -1,23 +1,13 @@
-#if DEBUG
 import Foundation
 
 /// In-process fixtures for UI automation. No requests or remote images are used.
-/// Enabled only in Debug builds launched with the explicit -ui-testing argument.
+/// Compiled only into the UI test host, never into the production application.
 actor MockHTTPClient: HTTPClient {
-    enum Scenario: String, Sendable {
-        case success
-        case loading
-        case empty
-        case initialErrorThenSuccess
-        case pagination
-        case paginationErrorThenSuccess
-        case refresh
-    }
 
-    private let scenario: Scenario
+    private let scenario: UITestScenario
     private var attempts: [Int: Int] = [:]
 
-    init(scenario: Scenario) {
+    init(scenario: UITestScenario) {
         self.scenario = scenario
     }
 
@@ -74,7 +64,7 @@ actor MockHTTPClient: HTTPClient {
     private func article(_ id: Int, title: String? = nil) -> [String: Any] {
         [
             "id": id,
-            "title": title ?? "Новость \(id)",
+            "title": title ?? String(format: "Новость %03d", id),
             "description": "Описание новости \(id)",
             "published_at": "2026-10-01T12:00:00Z",
             "reading_time_minutes": 3,
@@ -85,4 +75,3 @@ actor MockHTTPClient: HTTPClient {
         ]
     }
 }
-#endif
