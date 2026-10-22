@@ -52,7 +52,19 @@
 		EBDCABDC2802FBF7491B0EE2 /* NewsCoverImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2D9FA89416A780D2A386D36 /* NewsCoverImageView.swift */; };
 		077994A360ADE819DFE3001D /* NewsHeroCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DC335F43AC365002D0D67D6 /* NewsHeroCardView.swift */; };
 		3291C1A5D78D83A576A3069F /* NewsRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F741D1046FFFAE168092CDFF /* NewsRowView.swift */; };
+		A10000000000000000000001 /* NewsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000003 /* NewsViewModelTests.swift */; };
+		A10000000000000000000002 /* ControlledNewsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000004 /* ControlledNewsRepository.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A10000000000000000000006 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3C1E6829307672EE00D44FF2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3C1E6830307672EE00D44FF2;
+			remoteInfo = NewsAppITMO;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		3C1E6831307672EE00D44FF2 /* NewsAppITMO.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NewsAppITMO.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -101,6 +113,9 @@
 		F2D9FA89416A780D2A386D36 /* NewsCoverImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsCoverImageView.swift; sourceTree = "<group>"; };
 		8DC335F43AC365002D0D67D6 /* NewsHeroCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsHeroCardView.swift; sourceTree = "<group>"; };
 		F741D1046FFFAE168092CDFF /* NewsRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsRowView.swift; sourceTree = "<group>"; };
+		A10000000000000000000003 /* NewsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsViewModelTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000004 /* ControlledNewsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlledNewsRepository.swift; sourceTree = "<group>"; };
+		A10000000000000000000005 /* NewsAppITMOTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NewsAppITMOTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +126,12 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A1000000000000000000000B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = ();
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -118,6 +139,7 @@
 			isa = PBXGroup;
 			children = (
 				3C1E68423076731200D44FF2 /* NewsAppITMO */,
+				A10000000000000000000007 /* NewsAppITMOTests */,
 				3C1E6832307672EE00D44FF2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -126,6 +148,7 @@
 			isa = PBXGroup;
 			children = (
 				3C1E6831307672EE00D44FF2 /* NewsAppITMO.app */,
+				A10000000000000000000005 /* NewsAppITMOTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -678,6 +701,15 @@
 			path = Types;
 			sourceTree = "<group>";
 		};
+		A10000000000000000000007 /* NewsAppITMOTests */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000003 /* NewsViewModelTests.swift */,
+				A10000000000000000000004 /* ControlledNewsRepository.swift */,
+			);
+			path = NewsAppITMOTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -700,6 +732,23 @@
 			productReference = 3C1E6831307672EE00D44FF2 /* NewsAppITMO.app */;
 			productType = "com.apple.product-type.application";
 		};
+		A10000000000000000000008 /* NewsAppITMOTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A10000000000000000000009 /* Build configuration list for PBXNativeTarget "NewsAppITMOTests" */;
+			buildPhases = (
+				A1000000000000000000000A /* Sources */,
+				A1000000000000000000000B /* Frameworks */,
+				A1000000000000000000000C /* Resources */,
+			);
+			buildRules = ();
+			dependencies = (
+				A1000000000000000000000D /* PBXTargetDependency */,
+			);
+			name = NewsAppITMOTests;
+			productName = NewsAppITMOTests;
+			productReference = A10000000000000000000005 /* NewsAppITMOTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -710,6 +759,10 @@
 				LastSwiftUpdateCheck = 2630;
 				LastUpgradeCheck = 2630;
 				TargetAttributes = {
+					A10000000000000000000008 = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 3C1E6830307672EE00D44FF2;
+					};
 					3C1E6830307672EE00D44FF2 = {
 						CreatedOnToolsVersion = 26.3;
 					};
@@ -730,6 +783,7 @@
 			projectRoot = "";
 			targets = (
 				3C1E6830307672EE00D44FF2 /* NewsAppITMO */,
+				A10000000000000000000008 /* NewsAppITMOTests */,
 			);
 		};
 /* End PBXProject section */
@@ -741,6 +795,12 @@
 			files = (
 				3C1E68433076731200D44FF2 /* Assets.xcassets in Resources */,
 			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A1000000000000000000000C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = ();
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
@@ -797,7 +857,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A1000000000000000000000A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000001 /* NewsViewModelTests.swift in Sources */,
+				A10000000000000000000002 /* ControlledNewsRepository.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A1000000000000000000000D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3C1E6830307672EE00D44FF2 /* NewsAppITMO */;
+			targetProxy = A10000000000000000000006 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		3C1E683A307672EF00D44FF2 /* Debug */ = {
@@ -991,6 +1068,42 @@
 			};
 			name = Release;
 		};
+		A1000000000000000000000E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", "@loader_path/Frameworks");
+				PRODUCT_BUNDLE_IDENTIFIER = com.londxz.NewsAppITMOTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NewsAppITMO.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/NewsAppITMO";
+			};
+			name = Debug;
+		};
+		A1000000000000000000000F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", "@loader_path/Frameworks");
+				PRODUCT_BUNDLE_IDENTIFIER = com.londxz.NewsAppITMOTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NewsAppITMO.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/NewsAppITMO";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1008,6 +1121,15 @@
 			buildConfigurations = (
 				3C1E683D307672EF00D44FF2 /* Debug */,
 				3C1E683E307672EF00D44FF2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A10000000000000000000009 /* Build configuration list for PBXNativeTarget "NewsAppITMOTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1000000000000000000000E /* Debug */,
+				A1000000000000000000000F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
