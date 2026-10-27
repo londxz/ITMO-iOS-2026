@@ -72,6 +72,7 @@
 		E30000000000000000000105 /* CommentsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000005 /* CommentsViewModel.swift */; };
 		E30000000000000000000106 /* CommentRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000006 /* CommentRowView.swift */; };
 		E30000000000000000000107 /* CommentsSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000007 /* CommentsSheetView.swift */; };
+		E30000000000000000000108 /* CommentMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000008 /* CommentMapperTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -160,6 +161,7 @@
 		E30000000000000000000005 /* CommentsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsViewModel.swift; sourceTree = "<group>"; };
 		E30000000000000000000006 /* CommentRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentRowView.swift; sourceTree = "<group>"; };
 		E30000000000000000000007 /* CommentsSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsSheetView.swift; sourceTree = "<group>"; };
+		E30000000000000000000008 /* CommentMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentMapperTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -827,6 +829,7 @@
 		A10000000000000000000007 /* NewsAppITMOTests */ = {
 			isa = PBXGroup;
 			children = (
+				E30000000000000000000008 /* CommentMapperTests.swift */,
 				A10000000000000000000003 /* NewsViewModelTests.swift */,
 				A10000000000000000000004 /* MockNewsRepository.swift */,
 			);
@@ -1059,6 +1062,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E30000000000000000000108 /* CommentMapperTests.swift in Sources */,
 				A10000000000000000000001 /* NewsViewModelTests.swift in Sources */,
 				A10000000000000000000002 /* MockNewsRepository.swift in Sources */,
 			);

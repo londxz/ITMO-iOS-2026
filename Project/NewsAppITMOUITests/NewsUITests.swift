@@ -113,6 +113,25 @@ final class NewsUITests: XCTestCase {
         openPostAndReturn(id: 2)
     }
 
+    func testCommentsOpenForEachSelectedPost() {
+        launch(.success)
+        for id in [1, 2] {
+            let article = post(id)
+            XCTAssertTrue(article.waitForExistence(timeout: 5))
+            article.tap()
+            let comments = app.buttons["Комментарии"]
+            XCTAssertTrue(comments.waitForExistence(timeout: 5))
+            comments.tap()
+
+            XCTAssertTrue(app.navigationBars["Комментарии (1)"].waitForExistence(timeout: 5))
+            let text = app.staticTexts["Публикация ID: \(id)\nA & B\nnext line"]
+            XCTAssertTrue(text.waitForExistence(timeout: 5), app.debugDescription)
+            app.buttons["Готово"].tap()
+            XCTAssertTrue(text.waitForNonExistence(timeout: 5))
+            app.navigationBars["Публикация"].buttons.firstMatch.tap()
+        }
+    }
+
     func testSwitchingTabsAndReturningToNews() {
         launch(.success)
         XCTAssertTrue(post(1).waitForExistence(timeout: 5))
