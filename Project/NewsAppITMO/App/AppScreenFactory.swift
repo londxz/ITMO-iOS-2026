@@ -50,13 +50,12 @@ final class AppScreenFactory: ScreenFactory {
     }
 
     func makeCommentsSheet(postID: String) -> AnyView {
-        // это просто пример, тут будет собираться экран из частей (view viewmodel repository)
-        AnyView(
-            VStack(spacing: 16) {
-                Text("Комментарии к посту \(postID)")
-                    .font(.headline)
-            }
-            .presentationDetents([.medium, .large])
+        let repository = CommentsRepositoryImpl(client: container.httpClient)
+        return AnyView(
+            CommentsSheetView(
+                viewModel: CommentsViewModel(postID: postID, repository: repository),
+                imageCache: container.imageCache
+            )
         )
     }
 }

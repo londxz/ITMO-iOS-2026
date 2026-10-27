@@ -8,7 +8,8 @@
 import Foundation
 
 struct CommentUserDTO: Decodable, Sendable {
-    let name: String
+    // DEV.to returns an empty user object for hidden comments.
+    let name: String?
     let profileImage90: String?
 
     enum CodingKeys: String, CodingKey {

@@ -15,7 +15,7 @@ enum CommentMapper {
 
         return CommentModel(
             id: dto.idCode,
-            authorName: dto.user.name,
+            authorName: dto.user.name ?? "Неизвестный автор",
             authorAvatarURL: dto.user.profileImage90.flatMap(URL.init(string:)),
             text: cleanText,
             createdAt: dto.createdAt,
