@@ -9,10 +9,14 @@ import SwiftUI
 
 struct NewsRowView: View {
     let post: PostModel
+    let imageCache: any ImageCache
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            NewsCoverImageView(url: post.coverImageURL)
+            NewsCoverImageView(
+                url: post.coverImageURL,
+                imageCache: imageCache
+            )
                 .frame(width: 112, height: 76)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
 

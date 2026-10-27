@@ -11,10 +11,17 @@ struct NewsCoordinatorView: View {
     @ObservedObject var coordinator: NewsCoordinator
     let screenFactory: ScreenFactory
     let repository: any NewsRepository
+    let imageCache: any ImageCache
 
     var body: some View {
         NavigationStack(path: $coordinator.path) {
-            NewsView(viewModel: NewsViewModel(repository: repository, router: coordinator))
+            NewsView(
+                viewModel: NewsViewModel(
+                    repository: repository,
+                    router: coordinator
+                ),
+                imageCache: imageCache
+            )
                 .navigationDestination(for: NewsFlowRoute.self) { route in
                     // собираем экраны через фабрику, чтобы не связывать их
                     switch route {

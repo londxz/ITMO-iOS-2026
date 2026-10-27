@@ -27,7 +27,8 @@ struct AppRootTabView: View {
             NewsCoordinatorView(
                 coordinator: coordinator.newsCoordinator,
                 screenFactory: screenFactory,
-                repository: newsRepository
+                repository: newsRepository,
+                imageCache: container.imageCache
             )
             .tabItem {
                 Label("Новости", systemImage: "newspaper")

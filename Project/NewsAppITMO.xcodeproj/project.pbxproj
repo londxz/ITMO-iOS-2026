@@ -59,6 +59,12 @@
 		C10000000000000000000001 /* UITestHostApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000003; };
 		C10000000000000000000002 /* UITestScenario.swift in Host Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000004; };
 		C10000000000000000000011 /* UITestScenario.swift in UI Test Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000004; };
+		D20000000000000000000001 /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000011 /* ImageCache.swift */; };
+		D20000000000000000000002 /* BookmarksStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000012 /* BookmarksStorage.swift */; };
+		D20000000000000000000003 /* CachedAsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000013 /* CachedAsyncImage.swift */; };
+		D20000000000000000000004 /* AuthorHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000014 /* AuthorHeaderView.swift */; };
+		D20000000000000000000005 /* MetricsBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000015 /* MetricsBarView.swift */; };
+		D20000000000000000000006 /* TagPillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000016 /* TagPillView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -134,6 +140,12 @@
 		C10000000000000000000003 /* UITestHostApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestHostApp.swift; sourceTree = "<group>"; };
 		C10000000000000000000004 /* UITestScenario.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestScenario.swift; sourceTree = "<group>"; };
 		C10000000000000000000005 /* NewsAppITMOUITestHost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NewsAppITMOUITestHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D20000000000000000000011 /* ImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
+		D20000000000000000000012 /* BookmarksStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksStorage.swift; sourceTree = "<group>"; };
+		D20000000000000000000013 /* CachedAsyncImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedAsyncImage.swift; sourceTree = "<group>"; };
+		D20000000000000000000014 /* AuthorHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorHeaderView.swift; sourceTree = "<group>"; };
+		D20000000000000000000015 /* MetricsBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsBarView.swift; sourceTree = "<group>"; };
+		D20000000000000000000016 /* TagPillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagPillView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -297,6 +309,8 @@
 		3C1E684A3076741300D44FF2 /* Storage */ = {
 			isa = PBXGroup;
 			children = (
+				D20000000000000000000011 /* ImageCache.swift */,
+				D20000000000000000000012 /* BookmarksStorage.swift */,
 			);
 			path = Storage;
 			sourceTree = "<group>";
@@ -364,6 +378,10 @@
 				975C4E2FBC974C189F532440 /* ErrorView.swift */,
 				FC4091C6FE0054E1A86A39BF /* EmptyStateView.swift */,
 				F74A83CEEFA17C12DF7D0100 /* RelativeTimeText.swift */,
+				D20000000000000000000013 /* CachedAsyncImage.swift */,
+				D20000000000000000000014 /* AuthorHeaderView.swift */,
+				D20000000000000000000015 /* MetricsBarView.swift */,
+				D20000000000000000000016 /* TagPillView.swift */,
 			);
 			path = CommonUI;
 			sourceTree = "<group>";
@@ -1000,6 +1018,12 @@
 				EBDCABDC2802FBF7491B0EE2 /* NewsCoverImageView.swift in Sources */,
 				077994A360ADE819DFE3001D /* NewsHeroCardView.swift in Sources */,
 				3291C1A5D78D83A576A3069F /* NewsRowView.swift in Sources */,
+				D20000000000000000000001 /* ImageCache.swift in Sources */,
+				D20000000000000000000002 /* BookmarksStorage.swift in Sources */,
+				D20000000000000000000003 /* CachedAsyncImage.swift in Sources */,
+				D20000000000000000000004 /* AuthorHeaderView.swift in Sources */,
+				D20000000000000000000005 /* MetricsBarView.swift in Sources */,
+				D20000000000000000000006 /* TagPillView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
