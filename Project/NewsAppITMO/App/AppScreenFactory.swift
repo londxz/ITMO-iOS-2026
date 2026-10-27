@@ -16,20 +16,7 @@ final class AppScreenFactory: ScreenFactory {
     }
 
     func makePostDetailView(id: String) -> AnyView {
-        // это просто пример, тут будет собираться экран из частей (view viewmodel repository)
-        AnyView(
-            VStack(spacing: 16) {
-                Image(systemName: "doc.text.fill")
-                    .font(.system(size: 50))
-                    .foregroundStyle(.blue)
-                Text("Детали публикации ID: \(id)")
-                    .font(.title2).bold()
-                Text("Здесь будет текст статьи и кнопка автора")
-                    .foregroundStyle(.secondary)
-            }
-            .navigationTitle("Публикация")
-            .navigationBarTitleDisplayMode(.inline)
-        )
+        AnyView(PostDetailPlaceholderView(postID: id, screenFactory: self))
     }
 
     func makeAuthorProfileView(id: String, username: String) -> AnyView {
@@ -50,13 +37,42 @@ final class AppScreenFactory: ScreenFactory {
     }
 
     func makeCommentsSheet(postID: String) -> AnyView {
-        // это просто пример, тут будет собираться экран из частей (view viewmodel repository)
-        AnyView(
-            VStack(spacing: 16) {
-                Text("Комментарии к посту \(postID)")
-                    .font(.headline)
-            }
-            .presentationDetents([.medium, .large])
+        let repository = CommentsRepositoryImpl(client: container.httpClient)
+        return AnyView(
+            CommentsSheetView(
+                viewModel: CommentsViewModel(postID: postID, repository: repository),
+                imageCache: container.imageCache
+            )
         )
+    }
+}
+
+/// Keeps comments accessible until the full PostDetail feature replaces this screen.
+private struct PostDetailPlaceholderView: View {
+    let postID: String
+    let screenFactory: any ScreenFactory
+    @State private var isCommentsPresented = false
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "doc.text.fill")
+                .font(.system(size: 50))
+                .foregroundStyle(.blue)
+            Text("Детали публикации ID: \(postID)")
+                .font(.title2).bold()
+            Text("Здесь будет текст статьи и кнопка автора")
+                .foregroundStyle(.secondary)
+            Button {
+                isCommentsPresented = true
+            } label: {
+                Label("Комментарии", systemImage: "bubble.left.and.bubble.right")
+            }
+            .buttonStyle(.borderedProminent)
+        }
+        .navigationTitle("Публикация")
+        .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $isCommentsPresented) {
+            screenFactory.makeCommentsSheet(postID: postID)
+        }
     }
 }

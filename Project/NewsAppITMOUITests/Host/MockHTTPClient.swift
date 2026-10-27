@@ -12,6 +12,21 @@ actor MockHTTPClient: HTTPClient {
     }
 
     func send<T: Decodable & Sendable>(_ endpoint: any Endpoint) async throws -> T {
+        if let endpoint = endpoint as? CommentsEndpoint,
+           case .comments(let postID) = endpoint {
+            let comments: [[String: Any]] = [[
+                "id_code": "comment-\(postID)",
+                "created_at": "2026-10-01T12:00:00Z",
+                "body_html": "<p>Публикация ID: \(postID)</p><p>A &amp; B<br>next line</p>",
+                "user": ["name": "Автор комментария"],
+                "children": []
+            ]]
+            let data = try JSONSerialization.data(withJSONObject: comments)
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            return try decoder.decode(T.self, from: data)
+        }
+
         guard let endpoint = endpoint as? NewsEndpoint else {
             throw NetworkError.invalidURL
         }

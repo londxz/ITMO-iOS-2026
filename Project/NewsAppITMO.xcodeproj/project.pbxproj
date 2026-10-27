@@ -65,6 +65,14 @@
 		D20000000000000000000004 /* AuthorHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000014 /* AuthorHeaderView.swift */; };
 		D20000000000000000000005 /* MetricsBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000015 /* MetricsBarView.swift */; };
 		D20000000000000000000006 /* TagPillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000016 /* TagPillView.swift */; };
+		E30000000000000000000101 /* CommentsEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000001 /* CommentsEndpoint.swift */; };
+		E30000000000000000000102 /* CommentsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000002 /* CommentsRepository.swift */; };
+		E30000000000000000000103 /* CommentsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000003 /* CommentsState.swift */; };
+		E30000000000000000000104 /* CommentsAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000004 /* CommentsAction.swift */; };
+		E30000000000000000000105 /* CommentsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000005 /* CommentsViewModel.swift */; };
+		E30000000000000000000106 /* CommentRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000006 /* CommentRowView.swift */; };
+		E30000000000000000000107 /* CommentsSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000007 /* CommentsSheetView.swift */; };
+		E30000000000000000000108 /* CommentMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000008 /* CommentMapperTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -146,6 +154,14 @@
 		D20000000000000000000014 /* AuthorHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorHeaderView.swift; sourceTree = "<group>"; };
 		D20000000000000000000015 /* MetricsBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsBarView.swift; sourceTree = "<group>"; };
 		D20000000000000000000016 /* TagPillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagPillView.swift; sourceTree = "<group>"; };
+		E30000000000000000000001 /* CommentsEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsEndpoint.swift; sourceTree = "<group>"; };
+		E30000000000000000000002 /* CommentsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsRepository.swift; sourceTree = "<group>"; };
+		E30000000000000000000003 /* CommentsState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsState.swift; sourceTree = "<group>"; };
+		E30000000000000000000004 /* CommentsAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsAction.swift; sourceTree = "<group>"; };
+		E30000000000000000000005 /* CommentsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsViewModel.swift; sourceTree = "<group>"; };
+		E30000000000000000000006 /* CommentRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentRowView.swift; sourceTree = "<group>"; };
+		E30000000000000000000007 /* CommentsSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsSheetView.swift; sourceTree = "<group>"; };
+		E30000000000000000000008 /* CommentMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentMapperTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -620,6 +636,7 @@
 		3C640188307676AB0062B044 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				E30000000000000000000006 /* CommentRowView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -627,6 +644,7 @@
 		3C640189307676AB0062B044 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				E30000000000000000000007 /* CommentsSheetView.swift */,
 				3C640188307676AB0062B044 /* Components */,
 			);
 			path = Views;
@@ -635,6 +653,9 @@
 		3C64018A307676AB0062B044 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				E30000000000000000000005 /* CommentsViewModel.swift */,
+				E30000000000000000000004 /* CommentsAction.swift */,
+				E30000000000000000000003 /* CommentsState.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -651,6 +672,8 @@
 		3C64018C307676AB0062B044 /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				E30000000000000000000002 /* CommentsRepository.swift */,
+				E30000000000000000000001 /* CommentsEndpoint.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -806,6 +829,7 @@
 		A10000000000000000000007 /* NewsAppITMOTests */ = {
 			isa = PBXGroup;
 			children = (
+				E30000000000000000000008 /* CommentMapperTests.swift */,
 				A10000000000000000000003 /* NewsViewModelTests.swift */,
 				A10000000000000000000004 /* MockNewsRepository.swift */,
 			);
@@ -974,6 +998,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E30000000000000000000107 /* CommentsSheetView.swift in Sources */,
+				E30000000000000000000106 /* CommentRowView.swift in Sources */,
+				E30000000000000000000105 /* CommentsViewModel.swift in Sources */,
+				E30000000000000000000104 /* CommentsAction.swift in Sources */,
+				E30000000000000000000103 /* CommentsState.swift in Sources */,
+				E30000000000000000000102 /* CommentsRepository.swift in Sources */,
+				E30000000000000000000101 /* CommentsEndpoint.swift in Sources */,
 				3C6401C2307690AE0062B044 /* HTTPMethod.swift in Sources */,
 				3C6401BE30768EF20062B044 /* CommentMapper.swift in Sources */,
 				3C6401A4307679FA0062B044 /* AppRootTabView.swift in Sources */,
@@ -1031,6 +1062,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E30000000000000000000108 /* CommentMapperTests.swift in Sources */,
 				A10000000000000000000001 /* NewsViewModelTests.swift in Sources */,
 				A10000000000000000000002 /* MockNewsRepository.swift in Sources */,
 			);
