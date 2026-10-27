@@ -9,12 +9,13 @@ import SwiftUI
 
 struct NewsCoverImageView: View {
     let url: URL?
+    let imageCache: any ImageCache
 
     var body: some View {
         Rectangle()
             .fill(.quaternary)
             .overlay {
-                AsyncImage(url: url) { phase in
+                CachedAsyncImage(url: url, imageCache: imageCache) { phase in
                     switch phase {
                     case .success(let image):
                         image

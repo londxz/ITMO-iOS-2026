@@ -9,9 +9,14 @@ import SwiftUI
 
 struct NewsView: View {
     @StateObject private var viewModel: NewsViewModel
+    private let imageCache: any ImageCache
 
-    init(viewModel: @autoclosure @escaping () -> NewsViewModel) {
+    init(
+        viewModel: @autoclosure @escaping () -> NewsViewModel,
+        imageCache: any ImageCache
+    ) {
         _viewModel = StateObject(wrappedValue: viewModel())
+        self.imageCache = imageCache
     }
 
     var body: some View {
@@ -51,7 +56,10 @@ struct NewsView: View {
                     Button {
                         viewModel.send(.didSelectPost(id: heroPost.id))
                     } label: {
-                        NewsHeroCardView(post: heroPost)
+                        NewsHeroCardView(
+                            post: heroPost,
+                            imageCache: imageCache
+                        )
                     }
                     .buttonStyle(.plain)
                     .padding(.horizontal)
@@ -64,7 +72,10 @@ struct NewsView: View {
                         Button {
                             viewModel.send(.didSelectPost(id: post.id))
                         } label: {
-                            NewsRowView(post: post)
+                            NewsRowView(
+                                post: post,
+                                imageCache: imageCache
+                            )
                         }
                         .buttonStyle(.plain)
                         Divider()
