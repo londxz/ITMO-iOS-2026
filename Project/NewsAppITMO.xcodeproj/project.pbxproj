@@ -122,6 +122,11 @@
 		AC9F590213CBC77C49CDE849 /* AuthorProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28CF3A3F3524F85F92B9F990 /* AuthorProfileViewModel.swift */; };
 		9492CC5491879100558C70CF /* AuthorEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19CC887FB3F179184BFAFB39 /* AuthorEndpoint.swift */; };
 		60C429B5DB46DA48ECEFDE17 /* AuthorRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4494F82066499F482472EF95 /* AuthorRepository.swift */; };
+		C77803A930B73F825AF454F5 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B3256E3B303C331113E664A /* AppTheme.swift */; };
+		4AF30F0E4283E64DE55A66B2 /* SettingsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F1CCD8D2611C4841CD4E398 /* SettingsState.swift */; };
+		23BED889443049E2EB4CE5B8 /* SettingsAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = E18F9B6CF9D9F512C42387E5 /* SettingsAction.swift */; };
+		8DB0D8CD21A03B8E4D84ABE8 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DA854E61FCC0CA06EAC9C6 /* SettingsViewModel.swift */; };
+		211FA32153F2CB4FE22B0FE8 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F9CEA020FA55197B715ED40 /* SettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -258,6 +263,11 @@
 		28CF3A3F3524F85F92B9F990 /* AuthorProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorProfileViewModel.swift; sourceTree = "<group>"; };
 		19CC887FB3F179184BFAFB39 /* AuthorEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorEndpoint.swift; sourceTree = "<group>"; };
 		4494F82066499F482472EF95 /* AuthorRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorRepository.swift; sourceTree = "<group>"; };
+		1B3256E3B303C331113E664A /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
+		7F1CCD8D2611C4841CD4E398 /* SettingsState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsState.swift; sourceTree = "<group>"; };
+		E18F9B6CF9D9F512C42387E5 /* SettingsAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsAction.swift; sourceTree = "<group>"; };
+		E0DA854E61FCC0CA06EAC9C6 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		3F9CEA020FA55197B715ED40 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -921,6 +931,7 @@
 			isa = PBXGroup;
 			children = (
 				3C64019A307676AF0062B044 /* Components */,
+				3F9CEA020FA55197B715ED40 /* SettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -928,6 +939,10 @@
 		3C64019C307676AF0062B044 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				1B3256E3B303C331113E664A /* AppTheme.swift */,
+				7F1CCD8D2611C4841CD4E398 /* SettingsState.swift */,
+				E18F9B6CF9D9F512C42387E5 /* SettingsAction.swift */,
+				E0DA854E61FCC0CA06EAC9C6 /* SettingsViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -1247,6 +1262,11 @@
 				AC9F590213CBC77C49CDE849 /* AuthorProfileViewModel.swift in Sources */,
 				9492CC5491879100558C70CF /* AuthorEndpoint.swift in Sources */,
 				60C429B5DB46DA48ECEFDE17 /* AuthorRepository.swift in Sources */,
+				C77803A930B73F825AF454F5 /* AppTheme.swift in Sources */,
+				4AF30F0E4283E64DE55A66B2 /* SettingsState.swift in Sources */,
+				23BED889443049E2EB4CE5B8 /* SettingsAction.swift in Sources */,
+				8DB0D8CD21A03B8E4D84ABE8 /* SettingsViewModel.swift in Sources */,
+				211FA32153F2CB4FE22B0FE8 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

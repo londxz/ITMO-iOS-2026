@@ -238,7 +238,7 @@ final class NewsUITests: XCTestCase {
         for (name, text) in [
             ("Блог", "Статья блога 1"),
             ("Закладки", "Сохранённых статей пока нет"),
-            ("Настройки", "Здесь будут настройки приложения")
+            ("Настройки", "Очистить кэш изображений")
         ] {
             tabs.buttons[name].tap()
             let element = app.descendants(matching: .any)
