@@ -28,20 +28,15 @@ final class AppScreenFactory: ScreenFactory {
     }
 
     func makeAuthorProfileView(id: String, username: String) -> AnyView {
-        // это просто пример, тут будет собираться экран из частей (view viewmodel repository)
-        AnyView(
-            VStack(spacing: 16) {
-                Image(systemName: "person.crop.circle.fill")
-                    .font(.system(size: 60))
-                    .foregroundStyle(.purple)
-                Text("Профиль автора @\(username)")
-                    .font(.title2).bold()
-                Text("ID: \(id)")
-                    .foregroundStyle(.secondary)
-            }
-            .navigationTitle("Автор")
-            .navigationBarTitleDisplayMode(.inline)
-        )
+        let repository = AuthorRepositoryImpl(client: container.httpClient)
+        return AnyView(AuthorCoordinatorView(
+            authorID: id,
+            username: username,
+            coordinator: AuthorCoordinator(),
+            repository: repository,
+            imageCache: container.imageCache,
+            screenFactory: self
+        ))
     }
 
     func makeCommentsSheet(postID: String) -> AnyView {

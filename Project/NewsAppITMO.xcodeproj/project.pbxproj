@@ -110,6 +110,18 @@
 		8AD02EC17FB2A9367C1255CD /* BlogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24A45245E2357E1B2FC888BC /* BlogViewModel.swift */; };
 		BE3A0BC200A984326166ADFB /* BlogEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A1F53333136D32AD7382059 /* BlogEndpoint.swift */; };
 		402317AA20338A7D0D55EA29 /* BlogRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = E70938B6E080CB53FE4AB0ED /* BlogRepository.swift */; };
+		AE9744F5EAC37C045384BEBF /* AuthorFlowRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67DEAB57681AB97687B57514 /* AuthorFlowRoute.swift */; };
+		124A10BED478F2837CDF1BB5 /* AuthorCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8968A71C63A1D3E4AF644B9D /* AuthorCoordinator.swift */; };
+		96D3C44D565E5EAC23FA0FA6 /* AuthorCoordinatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B42F36BE2111F8729D8A3D9 /* AuthorCoordinatorView.swift */; };
+		26A1B9154E3798FF5FDEFB55 /* AuthorBioHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DF5BC493E1613B2189DB2CF /* AuthorBioHeaderView.swift */; };
+		082F0F06E907A9C5FA55CF3B /* AuthorPostRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E90BC3EAAB255057F8C388E /* AuthorPostRowView.swift */; };
+		CE8E5BD5072CF92905A997F4 /* AuthorProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6827F4DB7A9BACF386A5EF75 /* AuthorProfileView.swift */; };
+		9586AB6C9F1BF60FA14A42A2 /* AuthorState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E1B1E8DC40BA159FAC0EB2F /* AuthorState.swift */; };
+		5887F2A37CF3C47AEDA9FDFF /* AuthorAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DECF3C833E2ACBF8D9E9E2 /* AuthorAction.swift */; };
+		2C99C970BDD8C31B97B83991 /* AuthorRouting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC88B78F99F8AEF410AC66B /* AuthorRouting.swift */; };
+		AC9F590213CBC77C49CDE849 /* AuthorProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28CF3A3F3524F85F92B9F990 /* AuthorProfileViewModel.swift */; };
+		9492CC5491879100558C70CF /* AuthorEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19CC887FB3F179184BFAFB39 /* AuthorEndpoint.swift */; };
+		60C429B5DB46DA48ECEFDE17 /* AuthorRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4494F82066499F482472EF95 /* AuthorRepository.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -234,6 +246,18 @@
 		24A45245E2357E1B2FC888BC /* BlogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlogViewModel.swift; sourceTree = "<group>"; };
 		6A1F53333136D32AD7382059 /* BlogEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlogEndpoint.swift; sourceTree = "<group>"; };
 		E70938B6E080CB53FE4AB0ED /* BlogRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlogRepository.swift; sourceTree = "<group>"; };
+		67DEAB57681AB97687B57514 /* AuthorFlowRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorFlowRoute.swift; sourceTree = "<group>"; };
+		8968A71C63A1D3E4AF644B9D /* AuthorCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorCoordinator.swift; sourceTree = "<group>"; };
+		7B42F36BE2111F8729D8A3D9 /* AuthorCoordinatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorCoordinatorView.swift; sourceTree = "<group>"; };
+		2DF5BC493E1613B2189DB2CF /* AuthorBioHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorBioHeaderView.swift; sourceTree = "<group>"; };
+		6E90BC3EAAB255057F8C388E /* AuthorPostRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorPostRowView.swift; sourceTree = "<group>"; };
+		6827F4DB7A9BACF386A5EF75 /* AuthorProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorProfileView.swift; sourceTree = "<group>"; };
+		1E1B1E8DC40BA159FAC0EB2F /* AuthorState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorState.swift; sourceTree = "<group>"; };
+		D0DECF3C833E2ACBF8D9E9E2 /* AuthorAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorAction.swift; sourceTree = "<group>"; };
+		3DC88B78F99F8AEF410AC66B /* AuthorRouting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorRouting.swift; sourceTree = "<group>"; };
+		28CF3A3F3524F85F92B9F990 /* AuthorProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorProfileViewModel.swift; sourceTree = "<group>"; };
+		19CC887FB3F179184BFAFB39 /* AuthorEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorEndpoint.swift; sourceTree = "<group>"; };
+		4494F82066499F482472EF95 /* AuthorRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorRepository.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -778,6 +802,9 @@
 		3C64018D307676AC0062B044 /* Coordinator */ = {
 			isa = PBXGroup;
 			children = (
+				67DEAB57681AB97687B57514 /* AuthorFlowRoute.swift */,
+				8968A71C63A1D3E4AF644B9D /* AuthorCoordinator.swift */,
+				7B42F36BE2111F8729D8A3D9 /* AuthorCoordinatorView.swift */,
 			);
 			path = Coordinator;
 			sourceTree = "<group>";
@@ -785,6 +812,8 @@
 		3C64018E307676AC0062B044 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				2DF5BC493E1613B2189DB2CF /* AuthorBioHeaderView.swift */,
+				6E90BC3EAAB255057F8C388E /* AuthorPostRowView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -793,6 +822,7 @@
 			isa = PBXGroup;
 			children = (
 				3C64018E307676AC0062B044 /* Components */,
+				6827F4DB7A9BACF386A5EF75 /* AuthorProfileView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -800,6 +830,10 @@
 		3C640190307676AC0062B044 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				1E1B1E8DC40BA159FAC0EB2F /* AuthorState.swift */,
+				D0DECF3C833E2ACBF8D9E9E2 /* AuthorAction.swift */,
+				3DC88B78F99F8AEF410AC66B /* AuthorRouting.swift */,
+				28CF3A3F3524F85F92B9F990 /* AuthorProfileViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -816,6 +850,8 @@
 		3C640192307676AC0062B044 /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				19CC887FB3F179184BFAFB39 /* AuthorEndpoint.swift */,
+				4494F82066499F482472EF95 /* AuthorRepository.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -1199,6 +1235,18 @@
 				8AD02EC17FB2A9367C1255CD /* BlogViewModel.swift in Sources */,
 				BE3A0BC200A984326166ADFB /* BlogEndpoint.swift in Sources */,
 				402317AA20338A7D0D55EA29 /* BlogRepository.swift in Sources */,
+				AE9744F5EAC37C045384BEBF /* AuthorFlowRoute.swift in Sources */,
+				124A10BED478F2837CDF1BB5 /* AuthorCoordinator.swift in Sources */,
+				96D3C44D565E5EAC23FA0FA6 /* AuthorCoordinatorView.swift in Sources */,
+				26A1B9154E3798FF5FDEFB55 /* AuthorBioHeaderView.swift in Sources */,
+				082F0F06E907A9C5FA55CF3B /* AuthorPostRowView.swift in Sources */,
+				CE8E5BD5072CF92905A997F4 /* AuthorProfileView.swift in Sources */,
+				9586AB6C9F1BF60FA14A42A2 /* AuthorState.swift in Sources */,
+				5887F2A37CF3C47AEDA9FDFF /* AuthorAction.swift in Sources */,
+				2C99C970BDD8C31B97B83991 /* AuthorRouting.swift in Sources */,
+				AC9F590213CBC77C49CDE849 /* AuthorProfileViewModel.swift in Sources */,
+				9492CC5491879100558C70CF /* AuthorEndpoint.swift in Sources */,
+				60C429B5DB46DA48ECEFDE17 /* AuthorRepository.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
