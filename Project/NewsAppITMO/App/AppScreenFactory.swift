@@ -16,7 +16,15 @@ final class AppScreenFactory: ScreenFactory {
     }
 
     func makePostDetailView(id: String) -> AnyView {
-        AnyView(PostDetailPlaceholderView(postID: id, screenFactory: self))
+        let repository = PostDetailRepositoryImpl(client: container.httpClient)
+        return AnyView(PostDetailCoordinatorView(
+            postID: id,
+            coordinator: PostDetailCoordinator(),
+            repository: repository,
+            bookmarksStorage: container.bookmarksStorage,
+            imageCache: container.imageCache,
+            screenFactory: self
+        ))
     }
 
     func makeAuthorProfileView(id: String, username: String) -> AnyView {
@@ -44,35 +52,5 @@ final class AppScreenFactory: ScreenFactory {
                 imageCache: container.imageCache
             )
         )
-    }
-}
-
-/// Keeps comments accessible until the full PostDetail feature replaces this screen.
-private struct PostDetailPlaceholderView: View {
-    let postID: String
-    let screenFactory: any ScreenFactory
-    @State private var isCommentsPresented = false
-
-    var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "doc.text.fill")
-                .font(.system(size: 50))
-                .foregroundStyle(.blue)
-            Text("Детали публикации ID: \(postID)")
-                .font(.title2).bold()
-            Text("Здесь будет текст статьи и кнопка автора")
-                .foregroundStyle(.secondary)
-            Button {
-                isCommentsPresented = true
-            } label: {
-                Label("Комментарии", systemImage: "bubble.left.and.bubble.right")
-            }
-            .buttonStyle(.borderedProminent)
-        }
-        .navigationTitle("Публикация")
-        .navigationBarTitleDisplayMode(.inline)
-        .sheet(isPresented: $isCommentsPresented) {
-            screenFactory.makeCommentsSheet(postID: postID)
-        }
     }
 }

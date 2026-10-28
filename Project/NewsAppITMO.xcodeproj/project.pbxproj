@@ -73,6 +73,20 @@
 		E30000000000000000000106 /* CommentRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000006 /* CommentRowView.swift */; };
 		E30000000000000000000107 /* CommentsSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000007 /* CommentsSheetView.swift */; };
 		E30000000000000000000108 /* CommentMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000008 /* CommentMapperTests.swift */; };
+		F40000000000000000000101 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = F40000000000000000000001 /* MarkdownUI */; };
+		F40000000000000000000102 /* MarkdownUI in UI Host Frameworks */ = {isa = PBXBuildFile; productRef = F40000000000000000000002 /* MarkdownUI */; };
+		F50000000000000000000101 /* PostDetailEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = F50000000000000000000001 /* PostDetailEndpoint.swift */; };
+		F50000000000000000000102 /* PostDetailRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = F50000000000000000000002 /* PostDetailRepository.swift */; };
+		F50000000000000000000103 /* PostDetailState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F50000000000000000000003 /* PostDetailState.swift */; };
+		F50000000000000000000104 /* PostDetailAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F50000000000000000000004 /* PostDetailAction.swift */; };
+		F50000000000000000000105 /* PostDetailRouting.swift in Sources */ = {isa = PBXBuildFile; fileRef = F50000000000000000000005 /* PostDetailRouting.swift */; };
+		F50000000000000000000106 /* PostDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F50000000000000000000006 /* PostDetailViewModel.swift */; };
+		F50000000000000000000107 /* MarkdownContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F50000000000000000000007 /* MarkdownContentView.swift */; };
+		F50000000000000000000108 /* PostDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F50000000000000000000008 /* PostDetailView.swift */; };
+		F50000000000000000000109 /* PostDetailFlowRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = F50000000000000000000009 /* PostDetailFlowRoute.swift */; };
+		F5000000000000000000010A /* PostDetailCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5000000000000000000000A /* PostDetailCoordinator.swift */; };
+		F5000000000000000000010B /* PostDetailCoordinatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5000000000000000000000B /* PostDetailCoordinatorView.swift */; };
+		F5000000000000000000010C /* PostDetailViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5000000000000000000000C /* PostDetailViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -162,6 +176,18 @@
 		E30000000000000000000006 /* CommentRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentRowView.swift; sourceTree = "<group>"; };
 		E30000000000000000000007 /* CommentsSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsSheetView.swift; sourceTree = "<group>"; };
 		E30000000000000000000008 /* CommentMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentMapperTests.swift; sourceTree = "<group>"; };
+		F50000000000000000000001 /* PostDetailEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailEndpoint.swift; sourceTree = "<group>"; };
+		F50000000000000000000002 /* PostDetailRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailRepository.swift; sourceTree = "<group>"; };
+		F50000000000000000000003 /* PostDetailState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailState.swift; sourceTree = "<group>"; };
+		F50000000000000000000004 /* PostDetailAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailAction.swift; sourceTree = "<group>"; };
+		F50000000000000000000005 /* PostDetailRouting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailRouting.swift; sourceTree = "<group>"; };
+		F50000000000000000000006 /* PostDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailViewModel.swift; sourceTree = "<group>"; };
+		F50000000000000000000007 /* MarkdownContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownContentView.swift; sourceTree = "<group>"; };
+		F50000000000000000000008 /* PostDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailView.swift; sourceTree = "<group>"; };
+		F50000000000000000000009 /* PostDetailFlowRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailFlowRoute.swift; sourceTree = "<group>"; };
+		F5000000000000000000000A /* PostDetailCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailCoordinator.swift; sourceTree = "<group>"; };
+		F5000000000000000000000B /* PostDetailCoordinatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailCoordinatorView.swift; sourceTree = "<group>"; };
+		F5000000000000000000000C /* PostDetailViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -169,6 +195,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F40000000000000000000101 /* MarkdownUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -184,7 +211,7 @@
 			files = ();
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C1000000000000000000000B = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		C1000000000000000000000B = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (F40000000000000000000102 /* MarkdownUI in UI Host Frameworks */,); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -584,6 +611,9 @@
 		3C640181307676AA0062B044 /* Coordinator */ = {
 			isa = PBXGroup;
 			children = (
+				F5000000000000000000000B /* PostDetailCoordinatorView.swift */,
+				F5000000000000000000000A /* PostDetailCoordinator.swift */,
+				F50000000000000000000009 /* PostDetailFlowRoute.swift */,
 			);
 			path = Coordinator;
 			sourceTree = "<group>";
@@ -591,6 +621,7 @@
 		3C640182307676AA0062B044 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				F50000000000000000000007 /* MarkdownContentView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -598,6 +629,7 @@
 		3C640183307676AA0062B044 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				F50000000000000000000008 /* PostDetailView.swift */,
 				3C640182307676AA0062B044 /* Components */,
 			);
 			path = Views;
@@ -606,6 +638,10 @@
 		3C640184307676AA0062B044 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				F50000000000000000000006 /* PostDetailViewModel.swift */,
+				F50000000000000000000005 /* PostDetailRouting.swift */,
+				F50000000000000000000004 /* PostDetailAction.swift */,
+				F50000000000000000000003 /* PostDetailState.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -622,6 +658,8 @@
 		3C640186307676AA0062B044 /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				F50000000000000000000002 /* PostDetailRepository.swift */,
+				F50000000000000000000001 /* PostDetailEndpoint.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -829,6 +867,7 @@
 		A10000000000000000000007 /* NewsAppITMOTests */ = {
 			isa = PBXGroup;
 			children = (
+				F5000000000000000000000C /* PostDetailViewModelTests.swift */,
 				E30000000000000000000008 /* CommentMapperTests.swift */,
 				A10000000000000000000003 /* NewsViewModelTests.swift */,
 				A10000000000000000000004 /* MockNewsRepository.swift */,
@@ -873,6 +912,7 @@
 			);
 			name = NewsAppITMO;
 			packageProductDependencies = (
+				F40000000000000000000001 /* MarkdownUI */,
 			);
 			productName = NewsAppITMO;
 			productReference = 3C1E6831307672EE00D44FF2 /* NewsAppITMO.app */;
@@ -920,6 +960,7 @@
 			dependencies = ();
 			fileSystemSynchronizedGroups = (C10000000000000000000013,);
 			name = NewsAppITMOUITestHost;
+			packageProductDependencies = (F40000000000000000000002 /* MarkdownUI */,);
 			productName = NewsAppITMOUITestHost;
 			productReference = C10000000000000000000005;
 			productType = "com.apple.product-type.application";
@@ -956,6 +997,7 @@
 			);
 			mainGroup = 3C1E6828307672EE00D44FF2;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (F40000000000000000000003 /* swift-markdown-ui */,);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3C1E6832307672EE00D44FF2 /* Products */;
 			projectDirPath = "";
@@ -998,6 +1040,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F5000000000000000000010B /* PostDetailCoordinatorView.swift in Sources */,
+				F5000000000000000000010A /* PostDetailCoordinator.swift in Sources */,
+				F50000000000000000000109 /* PostDetailFlowRoute.swift in Sources */,
+				F50000000000000000000108 /* PostDetailView.swift in Sources */,
+				F50000000000000000000107 /* MarkdownContentView.swift in Sources */,
+				F50000000000000000000106 /* PostDetailViewModel.swift in Sources */,
+				F50000000000000000000105 /* PostDetailRouting.swift in Sources */,
+				F50000000000000000000104 /* PostDetailAction.swift in Sources */,
+				F50000000000000000000103 /* PostDetailState.swift in Sources */,
+				F50000000000000000000102 /* PostDetailRepository.swift in Sources */,
+				F50000000000000000000101 /* PostDetailEndpoint.swift in Sources */,
 				E30000000000000000000107 /* CommentsSheetView.swift in Sources */,
 				E30000000000000000000106 /* CommentRowView.swift in Sources */,
 				E30000000000000000000105 /* CommentsViewModel.swift in Sources */,
@@ -1062,6 +1115,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F5000000000000000000010C /* PostDetailViewModelTests.swift in Sources */,
 				E30000000000000000000108 /* CommentMapperTests.swift in Sources */,
 				A10000000000000000000001 /* NewsViewModelTests.swift in Sources */,
 				A10000000000000000000002 /* MockNewsRepository.swift in Sources */,
@@ -1101,6 +1155,27 @@
 			targetProxy = B10000000000000000000006 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+        F40000000000000000000003 /* swift-markdown-ui */ = {
+            isa = XCRemoteSwiftPackageReference;
+            repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
+            requirement = {kind = exactVersion; version = 2.4.1;};
+        };
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+        F40000000000000000000001 /* MarkdownUI */ = {
+            isa = XCSwiftPackageProductDependency;
+            package = F40000000000000000000003 /* swift-markdown-ui */;
+            productName = MarkdownUI;
+        };
+        F40000000000000000000002 /* MarkdownUI */ = {
+            isa = XCSwiftPackageProductDependency;
+            package = F40000000000000000000003 /* swift-markdown-ui */;
+            productName = MarkdownUI;
+        };
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCBuildConfiguration section */
 		3C1E683A307672EF00D44FF2 /* Debug */ = {

@@ -6,4 +6,8 @@ enum UITestScenario: String {
     case pagination
     case paginationErrorThenSuccess
     case refresh
+    case postDetailErrorThenSuccess
+    case postDetailOffline
+    case postDetailEmptyBody
+    case postDetailRefresh
 }
