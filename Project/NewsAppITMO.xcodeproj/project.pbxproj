@@ -87,6 +87,16 @@
 		F5000000000000000000010A /* PostDetailCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5000000000000000000000A /* PostDetailCoordinator.swift */; };
 		F5000000000000000000010B /* PostDetailCoordinatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5000000000000000000000B /* PostDetailCoordinatorView.swift */; };
 		F5000000000000000000010C /* PostDetailViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5000000000000000000000C /* PostDetailViewModelTests.swift */; };
+		F60000000000000000000101 /* BookmarksState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000001 /* BookmarksState.swift */; };
+		F60000000000000000000102 /* BookmarksAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000002 /* BookmarksAction.swift */; };
+		F60000000000000000000103 /* BookmarksRouting.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000003 /* BookmarksRouting.swift */; };
+		F60000000000000000000104 /* BookmarksViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000004 /* BookmarksViewModel.swift */; };
+		F60000000000000000000105 /* BookmarkCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000005 /* BookmarkCardView.swift */; };
+		F60000000000000000000106 /* BookmarksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000006 /* BookmarksView.swift */; };
+		F60000000000000000000107 /* BookmarksFlowRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000007 /* BookmarksFlowRoute.swift */; };
+		F60000000000000000000108 /* BookmarksCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000008 /* BookmarksCoordinator.swift */; };
+		F60000000000000000000109 /* BookmarksCoordinatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000009 /* BookmarksCoordinatorView.swift */; };
+		F6000000000000000000010A /* BookmarksViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6000000000000000000000A /* BookmarksViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -188,6 +198,16 @@
 		F5000000000000000000000A /* PostDetailCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailCoordinator.swift; sourceTree = "<group>"; };
 		F5000000000000000000000B /* PostDetailCoordinatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailCoordinatorView.swift; sourceTree = "<group>"; };
 		F5000000000000000000000C /* PostDetailViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailViewModelTests.swift; sourceTree = "<group>"; };
+		F60000000000000000000001 /* BookmarksState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksState.swift; sourceTree = "<group>"; };
+		F60000000000000000000002 /* BookmarksAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksAction.swift; sourceTree = "<group>"; };
+		F60000000000000000000003 /* BookmarksRouting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksRouting.swift; sourceTree = "<group>"; };
+		F60000000000000000000004 /* BookmarksViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksViewModel.swift; sourceTree = "<group>"; };
+		F60000000000000000000005 /* BookmarkCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkCardView.swift; sourceTree = "<group>"; };
+		F60000000000000000000006 /* BookmarksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksView.swift; sourceTree = "<group>"; };
+		F60000000000000000000007 /* BookmarksFlowRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksFlowRoute.swift; sourceTree = "<group>"; };
+		F60000000000000000000008 /* BookmarksCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksCoordinator.swift; sourceTree = "<group>"; };
+		F60000000000000000000009 /* BookmarksCoordinatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksCoordinatorView.swift; sourceTree = "<group>"; };
+		F6000000000000000000000A /* BookmarksViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -764,6 +784,9 @@
 		3C640193307676AD0062B044 /* Coordinator */ = {
 			isa = PBXGroup;
 			children = (
+				F60000000000000000000009 /* BookmarksCoordinatorView.swift */,
+				F60000000000000000000008 /* BookmarksCoordinator.swift */,
+				F60000000000000000000007 /* BookmarksFlowRoute.swift */,
 			);
 			path = Coordinator;
 			sourceTree = "<group>";
@@ -771,6 +794,7 @@
 		3C640194307676AD0062B044 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				F60000000000000000000005 /* BookmarkCardView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -778,6 +802,7 @@
 		3C640195307676AD0062B044 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				F60000000000000000000006 /* BookmarksView.swift */,
 				3C640194307676AD0062B044 /* Components */,
 			);
 			path = Views;
@@ -786,6 +811,10 @@
 		3C640196307676AD0062B044 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				F60000000000000000000004 /* BookmarksViewModel.swift */,
+				F60000000000000000000003 /* BookmarksRouting.swift */,
+				F60000000000000000000002 /* BookmarksAction.swift */,
+				F60000000000000000000001 /* BookmarksState.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -867,6 +896,7 @@
 		A10000000000000000000007 /* NewsAppITMOTests */ = {
 			isa = PBXGroup;
 			children = (
+				F6000000000000000000000A /* BookmarksViewModelTests.swift */,
 				F5000000000000000000000C /* PostDetailViewModelTests.swift */,
 				E30000000000000000000008 /* CommentMapperTests.swift */,
 				A10000000000000000000003 /* NewsViewModelTests.swift */,
@@ -1040,6 +1070,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F60000000000000000000109 /* BookmarksCoordinatorView.swift in Sources */,
+				F60000000000000000000108 /* BookmarksCoordinator.swift in Sources */,
+				F60000000000000000000107 /* BookmarksFlowRoute.swift in Sources */,
+				F60000000000000000000106 /* BookmarksView.swift in Sources */,
+				F60000000000000000000105 /* BookmarkCardView.swift in Sources */,
+				F60000000000000000000104 /* BookmarksViewModel.swift in Sources */,
+				F60000000000000000000103 /* BookmarksRouting.swift in Sources */,
+				F60000000000000000000102 /* BookmarksAction.swift in Sources */,
+				F60000000000000000000101 /* BookmarksState.swift in Sources */,
 				F5000000000000000000010B /* PostDetailCoordinatorView.swift in Sources */,
 				F5000000000000000000010A /* PostDetailCoordinator.swift in Sources */,
 				F50000000000000000000109 /* PostDetailFlowRoute.swift in Sources */,
@@ -1115,6 +1154,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F6000000000000000000010A /* BookmarksViewModelTests.swift in Sources */,
 				F5000000000000000000010C /* PostDetailViewModelTests.swift in Sources */,
 				E30000000000000000000108 /* CommentMapperTests.swift in Sources */,
 				A10000000000000000000001 /* NewsViewModelTests.swift in Sources */,

@@ -236,7 +236,7 @@ final class NewsUITests: XCTestCase {
         let tabs = app.tabBars
         for (name, text) in [
             ("Блог", "Здесь будут статьи блога"),
-            ("Закладки", "Здесь будут сохраненные статьи"),
+            ("Закладки", "Сохранённых статей пока нет"),
             ("Настройки", "Здесь будут настройки приложения")
         ] {
             tabs.buttons[name].tap()
@@ -262,7 +262,91 @@ final class NewsUITests: XCTestCase {
     private func launch(_ scenario: UITestScenario) {
         app.launchArguments = ["-AppleLanguages", "(ru)", "-AppleLocale", "ru_RU"]
         app.launchEnvironment["UITEST_SCENARIO"] = scenario.rawValue
+        app.launchEnvironment["UITEST_BOOKMARKS_FILE"] = UUID().uuidString
         app.launch()
+    }
+
+    func testBookmarksReactToSavingSearchingAndSwipeDeletion() {
+        launch(.success)
+        app.tabBars.buttons["Закладки"].tap()
+        XCTAssertTrue(app.staticTexts["Сохранённых статей пока нет"].waitForExistence(timeout: 5))
+        app.tabBars.buttons["Новости"].tap()
+        saveFirstArticle()
+        app.tabBars.buttons["Закладки"].tap()
+        let card = app.buttons["bookmark-1"]
+        XCTAssertTrue(card.waitForExistence(timeout: 5), app.debugDescription)
+
+        let snapshot = XCTAttachment(screenshot: app.screenshot())
+        snapshot.name = "Bookmarks card"
+        snapshot.lifetime = .keepAlways
+        add(snapshot)
+
+        let search = app.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 5), app.debugDescription)
+        search.tap()
+        search.typeText("нОвОсТь")
+        XCTAssertTrue(card.waitForExistence(timeout: 5))
+        search.typeText(" отсутствует")
+        XCTAssertTrue(app.staticTexts["Ничего не найдено"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.staticTexts["Сохранённых статей пока нет"].exists)
+        search.press(forDuration: 0.1)
+        let clear = search.buttons.firstMatch
+        XCTAssertTrue(clear.exists)
+        clear.tap()
+        app.keyboards.buttons.matching(NSPredicate(format: "label IN %@", ["Search", "Поиск", "search"])).firstMatch.tap()
+
+        XCTAssertTrue(card.waitForExistence(timeout: 5))
+        card.tap()
+        XCTAssertTrue(app.staticTexts["post-detail-title"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Удалить из закладок"].waitForExistence(timeout: 5))
+        app.navigationBars["Публикация"].buttons.firstMatch.tap()
+        XCTAssertTrue(card.waitForExistence(timeout: 5))
+        card.swipeLeft()
+        app.buttons["Удалить"].tap()
+        XCTAssertTrue(app.staticTexts["Сохранённых статей пока нет"].waitForExistence(timeout: 5))
+
+        app.tabBars.buttons["Новости"].tap()
+        XCTAssertTrue(app.buttons["Сохранить в закладки"].waitForExistence(timeout: 5))
+    }
+
+    func testBookmarksPersistAndOpenFullArticleAfterOfflineRelaunch() {
+        launch(.success)
+        saveFirstArticle()
+        app.terminate()
+        app.launchEnvironment["UITEST_SCENARIO"] = UITestScenario.bookmarksOffline.rawValue
+        app.launch()
+        app.tabBars.buttons["Закладки"].tap()
+        let card = app.buttons["bookmark-1"]
+        XCTAssertTrue(card.waitForExistence(timeout: 5), app.debugDescription)
+        card.tap()
+        XCTAssertTrue(app.staticTexts["post-detail-title"].waitForExistence(timeout: 5))
+        scrollTo(app.staticTexts["Раздел статьи"])
+        XCTAssertTrue(app.staticTexts["Раздел статьи"].exists)
+        XCTAssertTrue(app.buttons["Удалить из закладок"].exists)
+        XCTAssertFalse(app.buttons["Повторить"].exists)
+    }
+
+    func testRemovingBookmarkFromPostDetailUpdatesList() {
+        launch(.success)
+        saveFirstArticle()
+        app.tabBars.buttons["Закладки"].tap()
+        let card = app.buttons["bookmark-1"]
+        XCTAssertTrue(card.waitForExistence(timeout: 5))
+        card.tap()
+        XCTAssertTrue(app.buttons["Удалить из закладок"].waitForExistence(timeout: 5))
+        app.buttons["Удалить из закладок"].tap()
+        XCTAssertTrue(app.buttons["Сохранить в закладки"].waitForExistence(timeout: 5))
+        app.navigationBars["Публикация"].buttons.firstMatch.tap()
+        XCTAssertTrue(app.staticTexts["Сохранённых статей пока нет"].waitForExistence(timeout: 5))
+    }
+
+    private func saveFirstArticle() {
+        XCTAssertTrue(post(1).waitForExistence(timeout: 5))
+        post(1).tap()
+        let bookmark = app.buttons["Сохранить в закладки"]
+        XCTAssertTrue(bookmark.waitForExistence(timeout: 5))
+        bookmark.tap()
+        XCTAssertTrue(app.buttons["Удалить из закладок"].waitForExistence(timeout: 5))
     }
 
     private func scrollTo(

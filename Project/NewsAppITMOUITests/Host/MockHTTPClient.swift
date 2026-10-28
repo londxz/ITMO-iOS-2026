@@ -13,6 +13,9 @@ actor MockHTTPClient: HTTPClient {
     }
 
     func send<T: Decodable & Sendable>(_ endpoint: any Endpoint) async throws -> T {
+        if scenario == .bookmarksOffline {
+            throw NetworkError.transport(.notConnectedToInternet)
+        }
         if let endpoint = endpoint as? PostDetailEndpoint,
            case .post(let id) = endpoint {
             detailAttempts += 1

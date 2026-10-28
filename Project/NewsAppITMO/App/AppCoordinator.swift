@@ -20,4 +20,5 @@ final class AppCoordinator: ObservableObject {
    @Published var selectedTab: AppTab = .news
     
     let newsCoordinator = NewsCoordinator()
+    let bookmarksCoordinator = BookmarksCoordinator()
 }

@@ -11,7 +11,8 @@ struct UITestHostApp: App {
               let scenario = UITestScenario(rawValue: name) else {
             preconditionFailure("The UI test host requires a valid UITEST_SCENARIO")
         }
-        let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let fileName = ProcessInfo.processInfo.environment["UITEST_BOOKMARKS_FILE"] ?? UUID().uuidString
+        let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
         if scenario == .postDetailOffline {
             let saved = PostModel(
                 id: "1", title: "Сохранённая статья", summary: "", bodyMarkdown: "## Офлайн-текст\n\nПолная сохранённая статья.",
