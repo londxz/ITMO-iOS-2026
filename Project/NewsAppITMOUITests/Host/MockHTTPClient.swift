@@ -30,6 +30,8 @@ actor MockHTTPClient: HTTPClient {
 
                 Текст с **выделением** и [ссылкой](https://dev.to).
 
+                [Раздел](#section) и [Другая статья](./related-post).
+
                 - Первый пункт
                 - Второй пункт
 

@@ -166,6 +166,18 @@ final class NewsUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["post-detail-title"].waitForExistence(timeout: 5))
     }
 
+    func testPostDetailResolvesRelativeMarkdownLinks() {
+        launch(.success)
+        XCTAssertTrue(post(1).waitForExistence(timeout: 5))
+        post(1).tap()
+        XCTAssertTrue(app.staticTexts["post-detail-title"].waitForExistence(timeout: 5))
+        let section = app.links.matching(NSPredicate(format: "label == %@", "Раздел")).firstMatch
+        scrollTo(section)
+        XCTAssertEqual(section.identifier, "https://dev.to/test-author/post-1#section")
+        let related = app.links.matching(NSPredicate(format: "label == %@", "Другая статья")).firstMatch
+        XCTAssertEqual(related.identifier, "https://dev.to/test-author/related-post")
+    }
+
     func testPostDetailRetryAndEmptyMarkdown() {
         launch(.postDetailErrorThenSuccess)
         XCTAssertTrue(post(1).waitForExistence(timeout: 5))

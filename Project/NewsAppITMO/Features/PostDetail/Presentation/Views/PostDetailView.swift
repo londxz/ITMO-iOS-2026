@@ -89,7 +89,7 @@ struct PostDetailView: View {
 
                     metrics(post)
                     Divider()
-                    MarkdownContentView(markdown: post.bodyMarkdown ?? "")
+                    MarkdownContentView(markdown: post.bodyMarkdown ?? "", baseURL: post.webURL)
                     Divider()
                     metrics(post)
                 }

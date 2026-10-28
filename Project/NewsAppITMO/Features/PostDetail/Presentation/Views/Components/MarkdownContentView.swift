@@ -3,10 +3,12 @@ import SwiftUI
 
 struct MarkdownContentView: View {
     let markdown: String
+    let baseURL: URL?
     private let content: MarkdownContent
 
-    init(markdown: String) {
+    init(markdown: String, baseURL: URL?) {
         self.markdown = markdown
+        self.baseURL = baseURL
         content = MarkdownContent(markdown)
     }
 
@@ -20,7 +22,7 @@ struct MarkdownContentView: View {
             } else {
                 // MarkdownUI's nonthrowing CommonMark parser treats unsupported
                 // syntax (including DEV.to Liquid tags) as source text.
-                Markdown(content)
+                Markdown(content, baseURL: baseURL)
                     .markdownTheme(.gitHub)
             }
         }
