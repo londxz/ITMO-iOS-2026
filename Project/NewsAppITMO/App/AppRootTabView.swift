@@ -54,18 +54,12 @@ struct AppRootTabView: View {
             .tag(AppTab.blog)
             
             // Закладки
-            NavigationStack {
-                VStack(spacing: 12) {
-                    Image(systemName: "bookmark.fill")
-                        .font(.system(size: 48))
-                        .foregroundStyle(.purple)
-                    Text("Здесь будут сохраненные статьи")
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
-                }
-                .navigationTitle("Закладки")
-                .navigationBarTitleDisplayMode(.inline)
-            }
+            BookmarksCoordinatorView(
+                coordinator: coordinator.bookmarksCoordinator,
+                storage: container.bookmarksStorage,
+                imageCache: container.imageCache,
+                screenFactory: screenFactory
+            )
             .tabItem {
                 Label("Закладки", systemImage: "bookmark")
             }

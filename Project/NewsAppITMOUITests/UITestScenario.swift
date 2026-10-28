@@ -10,4 +10,5 @@ enum UITestScenario: String {
     case postDetailOffline
     case postDetailEmptyBody
     case postDetailRefresh
+    case bookmarksOffline
 }
