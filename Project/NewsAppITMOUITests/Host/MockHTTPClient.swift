@@ -65,6 +65,20 @@ actor MockHTTPClient: HTTPClient {
             return try decoder.decode(T.self, from: data)
         }
 
+        if let endpoint = endpoint as? BlogEndpoint {
+            let json: Any
+            switch endpoint {
+            case .tags:
+                json = [["id": 1, "name": "swift"], ["id": 2, "name": "ios"]]
+            case .articles(_, _, let page, _):
+                json = page == 1 ? (1...3).map { article($0, title: "Статья блога \($0)") } : []
+            }
+            let data = try JSONSerialization.data(withJSONObject: json)
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            return try decoder.decode(T.self, from: data)
+        }
+
         guard let endpoint = endpoint as? NewsEndpoint else {
             throw NetworkError.invalidURL
         }

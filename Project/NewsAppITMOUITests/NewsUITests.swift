@@ -235,12 +235,15 @@ final class NewsUITests: XCTestCase {
         XCTAssertTrue(post(1).waitForExistence(timeout: 5))
         let tabs = app.tabBars
         for (name, text) in [
-            ("Блог", "Здесь будут статьи блога"),
+            ("Блог", "Статья блога 1"),
             ("Закладки", "Сохранённых статей пока нет"),
             ("Настройки", "Здесь будут настройки приложения")
         ] {
             tabs.buttons[name].tap()
-            XCTAssertTrue(app.staticTexts[text].waitForExistence(timeout: 5))
+            let element = app.descendants(matching: .any)
+                .matching(NSPredicate(format: "label CONTAINS %@", text))
+                .firstMatch
+            XCTAssertTrue(element.waitForExistence(timeout: 5))
         }
         tabs.buttons["Новости"].tap()
         XCTAssertTrue(post(1).waitForExistence(timeout: 5))

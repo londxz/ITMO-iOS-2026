@@ -12,12 +12,14 @@ struct AppRootTabView: View {
     let container: AppContainer
     private let screenFactory: ScreenFactory
     private let newsRepository: any NewsRepository
+    private let blogRepository: any BlogRepository
     
     init(coordinator: AppCoordinator, container: AppContainer) {
         self.coordinator = coordinator
         self.container = container
         self.screenFactory = AppScreenFactory(container: container)
         self.newsRepository = NewsRepositoryImpl(client: container.httpClient)
+        self.blogRepository = BlogRepositoryImpl(client: container.httpClient)
     }
     
     var body: some View {
@@ -36,18 +38,12 @@ struct AppRootTabView: View {
             .tag(AppTab.news)
             
             // Блог
-            NavigationStack {
-                VStack(spacing: 12) {
-                    Image(systemName: "doc.text.image.fill")
-                        .font(.system(size: 48))
-                        .foregroundStyle(.orange)
-                    Text("Здесь будут статьи блога")
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
-                }
-                .navigationTitle("Блог")
-                .navigationBarTitleDisplayMode(.inline)
-            }
+            BlogCoordinatorView(
+                coordinator: coordinator.blogCoordinator,
+                screenFactory: screenFactory,
+                repository: blogRepository,
+                imageCache: container.imageCache
+            )
             .tabItem {
                 Label("Блог", systemImage: "doc.text.image")
             }
