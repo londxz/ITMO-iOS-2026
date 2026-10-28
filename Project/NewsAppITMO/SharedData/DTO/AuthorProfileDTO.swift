@@ -15,12 +15,14 @@ struct AuthorProfileDTO: Decodable, Sendable {
     let profileImage: String?
     let location: String?
     let websiteUrl: String?
-    let joinedAt: Date?
+    let githubUsername: String?
+    let joinedAt: String?
 
     enum CodingKeys: String, CodingKey {
         case id, username, name, summary, location
         case profileImage = "profile_image"
         case websiteUrl = "website_url"
+        case githubUsername = "github_username"
         case joinedAt = "joined_at"
     }
 }

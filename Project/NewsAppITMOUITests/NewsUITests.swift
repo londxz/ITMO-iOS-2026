@@ -161,7 +161,8 @@ final class NewsUITests: XCTestCase {
         XCTAssertTrue(author.waitForExistence(timeout: 5))
         scrollTo(author)
         author.tap()
-        XCTAssertTrue(app.staticTexts["Профиль автора @test-author"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["author-profile-name"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Статья автора 2")).firstMatch.waitForExistence(timeout: 5))
         app.navigationBars["Автор"].buttons.firstMatch.tap()
         XCTAssertTrue(app.staticTexts["post-detail-title"].waitForExistence(timeout: 5))
     }
