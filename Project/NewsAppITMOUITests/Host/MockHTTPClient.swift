@@ -6,12 +6,47 @@ actor MockHTTPClient: HTTPClient {
 
     private let scenario: UITestScenario
     private var attempts: [Int: Int] = [:]
+    private var detailAttempts = 0
 
     init(scenario: UITestScenario) {
         self.scenario = scenario
     }
 
     func send<T: Decodable & Sendable>(_ endpoint: any Endpoint) async throws -> T {
+        if let endpoint = endpoint as? PostDetailEndpoint,
+           case .post(let id) = endpoint {
+            detailAttempts += 1
+            if scenario == .postDetailOffline || (scenario == .postDetailErrorThenSuccess && detailAttempts == 1) {
+                throw NetworkError.transport(.notConnectedToInternet)
+            }
+            var detail = article(Int(id) ?? 1)
+            if scenario == .postDetailRefresh && detailAttempts > 1 {
+                detail["title"] = "Обновлённая статья"
+            }
+            detail["tag_list"] = "news, swift"
+            detail["url"] = "https://dev.to/test-author/post-\(id)"
+            detail["body_markdown"] = scenario == .postDetailEmptyBody ? "" : """
+                ## Раздел статьи
+
+                Текст с **выделением** и [ссылкой](https://dev.to).
+
+                [Раздел](#section) и [Другая статья](./related-post).
+
+                - Первый пункт
+                - Второй пункт
+
+                ```swift
+                let value = 1
+                ```
+
+                {% unsupported example %}
+                """
+            let data = try JSONSerialization.data(withJSONObject: detail)
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            return try decoder.decode(T.self, from: data)
+        }
+
         if let endpoint = endpoint as? CommentsEndpoint,
            case .comments(let postID) = endpoint {
             let comments: [[String: Any]] = [[

@@ -32,6 +32,31 @@ struct ArticleDTO: Decodable, Sendable {
         case tagList = "tag_list"
         case user, url
     }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(Int.self, forKey: .id)
+        title = try container.decode(String.self, forKey: .title)
+        description = try container.decodeIfPresent(String.self, forKey: .description)
+        bodyMarkdown = try container.decodeIfPresent(String.self, forKey: .bodyMarkdown)
+        publishedAt = try container.decode(Date.self, forKey: .publishedAt)
+        coverImage = try container.decodeIfPresent(String.self, forKey: .coverImage)
+        readingTimeMinutes = try container.decode(Int.self, forKey: .readingTimeMinutes)
+        publicReactionsCount = try container.decode(Int.self, forKey: .publicReactionsCount)
+        commentsCount = try container.decode(Int.self, forKey: .commentsCount)
+        // DEV.to's list endpoint uses an array; its detail endpoint uses CSV.
+        if let tags = try? container.decode([String].self, forKey: .tagList) {
+            tagList = tags
+        } else if let tags = try container.decodeIfPresent(String.self, forKey: .tagList) {
+            tagList = tags.split(separator: ",").map {
+                $0.trimmingCharacters(in: .whitespacesAndNewlines)
+            }.filter { !$0.isEmpty }
+        } else {
+            tagList = nil
+        }
+        user = try container.decode(UserDTO.self, forKey: .user)
+        url = try container.decodeIfPresent(String.self, forKey: .url)
+    }
 }
 
 struct UserDTO: Decodable, Sendable {

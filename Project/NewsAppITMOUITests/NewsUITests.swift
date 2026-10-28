@@ -119,8 +119,9 @@ final class NewsUITests: XCTestCase {
             let article = post(id)
             XCTAssertTrue(article.waitForExistence(timeout: 5))
             article.tap()
-            let comments = app.buttons["Комментарии"]
+            let comments = app.buttons.matching(identifier: "1 комментариев").firstMatch
             XCTAssertTrue(comments.waitForExistence(timeout: 5))
+            scrollTo(comments)
             comments.tap()
 
             XCTAssertTrue(app.navigationBars["Комментарии (1)"].waitForExistence(timeout: 5))
@@ -130,6 +131,103 @@ final class NewsUITests: XCTestCase {
             XCTAssertTrue(text.waitForNonExistence(timeout: 5))
             app.navigationBars["Публикация"].buttons.firstMatch.tap()
         }
+    }
+
+    func testPostDetailShowsMarkdownAndTogglesBookmark() {
+        launch(.success)
+        XCTAssertTrue(post(1).waitForExistence(timeout: 5))
+        post(1).tap()
+        let title = app.staticTexts["post-detail-title"]
+        XCTAssertTrue(title.waitForExistence(timeout: 5))
+        XCTAssertEqual(title.label, "Новость 001")
+        scrollTo(app.staticTexts["Раздел статьи"])
+        XCTAssertTrue(app.staticTexts["Раздел статьи"].exists)
+        scrollTo(app.staticTexts["Первый пункт"])
+        XCTAssertTrue(app.staticTexts["Первый пункт"].exists)
+
+        let bookmark = app.buttons["post-detail-bookmark"]
+        XCTAssertEqual(bookmark.label, "Сохранить в закладки")
+        bookmark.tap()
+        XCTAssertTrue(app.buttons["Удалить из закладок"].waitForExistence(timeout: 5))
+        bookmark.tap()
+        XCTAssertTrue(app.buttons["Сохранить в закладки"].waitForExistence(timeout: 5))
+    }
+
+    func testPostDetailRoutesToAuthorAndReturns() {
+        launch(.success)
+        XCTAssertTrue(post(1).waitForExistence(timeout: 5))
+        post(1).tap()
+        let author = app.buttons["post-detail-author"]
+        XCTAssertTrue(author.waitForExistence(timeout: 5))
+        scrollTo(author)
+        author.tap()
+        XCTAssertTrue(app.staticTexts["Профиль автора @test-author"].waitForExistence(timeout: 5))
+        app.navigationBars["Автор"].buttons.firstMatch.tap()
+        XCTAssertTrue(app.staticTexts["post-detail-title"].waitForExistence(timeout: 5))
+    }
+
+    func testPostDetailResolvesRelativeMarkdownLinks() {
+        launch(.success)
+        XCTAssertTrue(post(1).waitForExistence(timeout: 5))
+        post(1).tap()
+        XCTAssertTrue(app.staticTexts["post-detail-title"].waitForExistence(timeout: 5))
+        let section = app.links.matching(NSPredicate(format: "label == %@", "Раздел")).firstMatch
+        scrollTo(section)
+        XCTAssertEqual(section.identifier, "https://dev.to/test-author/post-1#section")
+        let related = app.links.matching(NSPredicate(format: "label == %@", "Другая статья")).firstMatch
+        XCTAssertEqual(related.identifier, "https://dev.to/test-author/related-post")
+    }
+
+    func testPostDetailRetryAndEmptyMarkdown() {
+        launch(.postDetailErrorThenSuccess)
+        XCTAssertTrue(post(1).waitForExistence(timeout: 5))
+        post(1).tap()
+        let retry = app.buttons["Повторить"]
+        XCTAssertTrue(retry.waitForExistence(timeout: 5))
+        retry.tap()
+        XCTAssertTrue(app.staticTexts["post-detail-title"].waitForExistence(timeout: 5))
+
+        app.terminate()
+        launch(.postDetailEmptyBody)
+        XCTAssertTrue(post(1).waitForExistence(timeout: 5))
+        post(1).tap()
+        scrollTo(app.staticTexts["Текст статьи пока недоступен"])
+        XCTAssertTrue(app.staticTexts["Текст статьи пока недоступен"].exists)
+    }
+
+    func testSavedPostDetailOpensWhenNetworkFails() {
+        launch(.postDetailOffline)
+        XCTAssertTrue(post(1).waitForExistence(timeout: 5))
+        post(1).tap()
+        let title = app.staticTexts["post-detail-title"]
+        XCTAssertTrue(title.waitForExistence(timeout: 5))
+        XCTAssertEqual(title.label, "Сохранённая статья")
+        scrollTo(app.staticTexts["Офлайн-текст"])
+        XCTAssertTrue(app.staticTexts["Офлайн-текст"].exists)
+        XCTAssertTrue(app.buttons["Удалить из закладок"].exists)
+        XCTAssertFalse(app.buttons["Повторить"].exists)
+    }
+
+    func testPostDetailShareLinkOpensSystemSheet() {
+        launch(.success)
+        XCTAssertTrue(post(1).waitForExistence(timeout: 5))
+        post(1).tap()
+        let share = app.buttons["Поделиться"]
+        XCTAssertTrue(share.waitForExistence(timeout: 5))
+        share.tap()
+        XCTAssertTrue(app.otherElements["ActivityListView"].waitForExistence(timeout: 5), app.debugDescription)
+    }
+
+    func testPostDetailPullToRefreshUpdatesArticle() {
+        launch(.postDetailRefresh)
+        XCTAssertTrue(post(1).waitForExistence(timeout: 5))
+        post(1).tap()
+        XCTAssertTrue(app.staticTexts["post-detail-title"].waitForExistence(timeout: 5))
+        let article = app.scrollViews.firstMatch
+        let start = article.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.2))
+        let end = article.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.85))
+        start.press(forDuration: 0.1, thenDragTo: end)
+        XCTAssertTrue(app.staticTexts["Обновлённая статья"].waitForExistence(timeout: 5))
     }
 
     func testSwitchingTabsAndReturningToNews() {
@@ -186,9 +284,9 @@ final class NewsUITests: XCTestCase {
         let button = post(id)
         XCTAssertTrue(button.waitForExistence(timeout: 5))
         button.tap()
-        let detail = app.staticTexts["Детали публикации ID: \(id)"]
+        let detail = app.staticTexts["post-detail-title"]
         XCTAssertTrue(detail.waitForExistence(timeout: 5))
-        XCTAssertEqual(detail.label, "Детали публикации ID: \(id)")
+        XCTAssertEqual(detail.label, String(format: "Новость %03d", id))
         app.navigationBars["Публикация"].buttons.firstMatch.tap()
         XCTAssertTrue(button.waitForExistence(timeout: 5))
         XCTAssertTrue(detail.waitForNonExistence(timeout: 5))
