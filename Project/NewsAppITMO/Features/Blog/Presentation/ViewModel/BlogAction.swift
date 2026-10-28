@@ -1,10 +1,3 @@
-//
-//  BlogAction.swift
-//  NewsAppITMO
-//
-//  Created by n.a.grebenkin on 28.10.2026.
-//
-
 enum BlogAction: Sendable {
     case onAppear
     case onDisappear

@@ -1,10 +1,3 @@
-//
-//  BlogSort.swift
-//  NewsAppITMO
-//
-//  Created by n.a.grebenkin on 28.10.2026.
-//
-
 enum BlogSort: String, CaseIterable, Hashable, Sendable {
     case fresh
     case topWeek

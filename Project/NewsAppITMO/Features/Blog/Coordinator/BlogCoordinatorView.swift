@@ -1,10 +1,3 @@
-//
-//  BlogCoordinatorView.swift
-//  NewsAppITMO
-//
-//  Created by n.a.grebenkin on 28.10.2026.
-//
-
 import SwiftUI
 
 struct BlogCoordinatorView: View {
@@ -23,7 +16,6 @@ struct BlogCoordinatorView: View {
                 imageCache: imageCache
             )
             .navigationDestination(for: BlogFlowRoute.self) { route in
-                // экраны статьи и автора собирает фабрика, Blog про них не знает
                 switch route {
                 case .postDetail(let id):
                     screenFactory.makePostDetailView(id: id)

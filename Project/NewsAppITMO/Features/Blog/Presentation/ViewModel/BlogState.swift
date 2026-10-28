@@ -1,13 +1,5 @@
-//
-//  BlogState.swift
-//  NewsAppITMO
-//
-//  Created by n.a.grebenkin on 28.10.2026.
-//
-
 struct BlogState: Equatable, Sendable {
     var tags: [BlogTagModel] = []
-    // nil — фильтр «Все»
     var selectedTag: BlogTagModel?
     var selectedSort: BlogSort = .fresh
 

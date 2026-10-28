@@ -240,7 +240,6 @@ final class NewsUITests: XCTestCase {
             ("Настройки", "Здесь будут настройки приложения")
         ] {
             tabs.buttons[name].tap()
-            // заголовок карточки блога — часть кнопки, поэтому ищем по label у любого элемента
             let element = app.descendants(matching: .any)
                 .matching(NSPredicate(format: "label CONTAINS %@", text))
                 .firstMatch

@@ -1,10 +1,3 @@
-//
-//  BlogView.swift
-//  NewsAppITMO
-//
-//  Created by n.a.grebenkin on 28.10.2026.
-//
-
 import SwiftUI
 
 struct BlogView: View {
@@ -20,8 +13,6 @@ struct BlogView: View {
     }
 
     var body: some View {
-        // один ScrollView на все состояния: если пересоздавать его при смене тега,
-        // навигационная панель теряет большой заголовок
         ScrollView {
             LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
                 Section {
@@ -141,7 +132,6 @@ struct BlogView: View {
             }
             .frame(maxWidth: .infinity)
             .padding()
-            // новый id на каждой странице, чтобы onAppear срабатывал снова
             .id(viewModel.state.currentPage)
         }
     }

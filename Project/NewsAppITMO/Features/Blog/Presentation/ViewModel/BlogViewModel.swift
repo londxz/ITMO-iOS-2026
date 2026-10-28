@@ -1,10 +1,3 @@
-//
-//  BlogViewModel.swift
-//  NewsAppITMO
-//
-//  Created by n.a.grebenkin on 28.10.2026.
-//
-
 import Foundation
 import Combine
 import OSLog
@@ -21,8 +14,6 @@ final class BlogViewModel: ObservableObject {
 
     private var initialLoadTask: Task<Void, Never>?
     private var paginationTask: Task<Void, Never>?
-    // меняется на каждую новую выдачу (refresh, тег, сортировка):
-    // ответ, пришедший для старого поколения, отбрасывается
     private var generationID = UUID()
 
     init(repository: any BlogRepository, router: (any BlogRouting)?) {
@@ -60,8 +51,6 @@ final class BlogViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Первая страница
-
     private func restartFeed() -> Task<Void, Never> {
         var newState = state
         newState.posts = []
@@ -78,7 +67,6 @@ final class BlogViewModel: ObservableObject {
         let generation = UUID()
         generationID = generation
         state.paginationLoad = .idle
-        // при pull-to-refresh старая лента остаётся на экране до ответа
         if state.initialLoad != .loaded {
             state.initialLoad = .loading
         }
@@ -96,14 +84,12 @@ final class BlogViewModel: ObservableObject {
         let sort = state.selectedSort
         let pageSize = Self.pageSize
 
-        // статьи стартуют сразу, теги грузятся параллельно с ними
         async let firstPage = repository.fetchArticles(tag: tag, sort: sort, page: 1, perPage: pageSize)
         var tags: [BlogTagModel]?
         if reloadTags {
             do {
                 tags = try await repository.fetchTags()
             } catch where !Task.isCancelled {
-                // без тегов лента всё равно работает, в карусели останется «Все»
                 logger.error("tags load failed: \(String(describing: error), privacy: .public)")
             } catch {}
         }
@@ -127,15 +113,12 @@ final class BlogViewModel: ObservableObject {
             if let tags {
                 state.tags = Self.tags(tags, keeping: state.selectedTag)
             }
-            // если упал refresh, а лента уже есть — оставляем её на экране
             if state.isEmpty {
                 state.initialLoad = .failed(AppError(error))
             }
         }
         initialLoadTask = nil
     }
-
-    // MARK: - Пагинация
 
     private func startPagination() -> Task<Void, Never>? {
         guard state.initialLoad == .loaded,
@@ -167,7 +150,6 @@ final class BlogViewModel: ObservableObject {
             )
             guard isCurrent(generation) else { return }
 
-            // лента сдвигается, пока её листают, поэтому страницы могут пересекаться
             var knownIDs = Set(state.posts.map(\.id))
             let newPosts = page.filter { knownIDs.insert($0.id).inserted }
 
@@ -183,8 +165,6 @@ final class BlogViewModel: ObservableObject {
             state.paginationLoad = .failed(AppError(error))
         }
     }
-
-    // MARK: - Уход с экрана
 
     private func cancelLoading() {
         initialLoadTask?.cancel()
@@ -203,7 +183,6 @@ final class BlogViewModel: ObservableObject {
         generation == generationID && !Task.isCancelled
     }
 
-    // выбранный тег не должен пропасть из карусели, если сервер его больше не вернул
     private static func tags(
         _ tags: [BlogTagModel],
         keeping selectedTag: BlogTagModel?

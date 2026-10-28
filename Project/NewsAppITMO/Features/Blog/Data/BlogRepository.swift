@@ -1,10 +1,3 @@
-//
-//  BlogRepository.swift
-//  NewsAppITMO
-//
-//  Created by n.a.grebenkin on 28.10.2026.
-//
-
 import Foundation
 
 protocol BlogRepository: Sendable {

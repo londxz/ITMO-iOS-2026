@@ -1,10 +1,3 @@
-//
-//  BlogCardView.swift
-//  NewsAppITMO
-//
-//  Created by n.a.grebenkin on 28.10.2026.
-//
-
 import SwiftUI
 
 struct BlogCardView: View {
@@ -22,7 +15,6 @@ struct BlogCardView: View {
                 action: onSelectAuthor
             )
 
-            // отдельные кнопки для автора и статьи, а не вложенные друг в друга
             Button(action: onSelectPost) {
                 articleContent
             }
@@ -96,7 +88,6 @@ struct BlogCardView: View {
                     }
                 }
             }
-            // у обложек DEV.to пропорции 1000×420
             .aspectRatio(1000 / 420, contentMode: .fit)
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .accessibilityHidden(true)
