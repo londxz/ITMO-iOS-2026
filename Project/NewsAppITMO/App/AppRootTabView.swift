@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AppRootTabView: View {
     @ObservedObject var coordinator: AppCoordinator
+    @AppStorage(SettingsStorageKey.appTheme) private var appTheme: AppTheme = .system
     let container: AppContainer
     private let screenFactory: ScreenFactory
     private let newsRepository: any NewsRepository
@@ -63,21 +64,15 @@ struct AppRootTabView: View {
             
             // Настройки
             NavigationStack {
-                VStack(spacing: 12) {
-                    Image(systemName: "gearshape.fill")
-                        .font(.system(size: 48))
-                        .foregroundStyle(.gray)
-                    Text("Здесь будут настройки приложения")
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
-                }
-                .navigationTitle("Настройки")
-                .navigationBarTitleDisplayMode(.inline)
+                SettingsView(
+                    viewModel: SettingsViewModel(imageCache: container.imageCache)
+                )
             }
             .tabItem {
                 Label("Настройки", systemImage: "gearshape")
             }
             .tag(AppTab.settings)
         }
+        .preferredColorScheme(appTheme.colorScheme)
     }
 }
