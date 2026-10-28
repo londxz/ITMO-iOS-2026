@@ -87,6 +87,8 @@
 		F5000000000000000000010A /* PostDetailCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5000000000000000000000A /* PostDetailCoordinator.swift */; };
 		F5000000000000000000010B /* PostDetailCoordinatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5000000000000000000000B /* PostDetailCoordinatorView.swift */; };
 		F5000000000000000000010C /* PostDetailViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5000000000000000000000C /* PostDetailViewModelTests.swift */; };
+		F5000000000000000000010D /* LiquidTagConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5000000000000000000000D /* LiquidTagConverter.swift */; };
+		F5000000000000000000010E /* LiquidTagConverterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5000000000000000000000E /* LiquidTagConverterTests.swift */; };
 		F60000000000000000000101 /* BookmarksState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000001 /* BookmarksState.swift */; };
 		F60000000000000000000102 /* BookmarksAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000002 /* BookmarksAction.swift */; };
 		F60000000000000000000103 /* BookmarksRouting.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000003 /* BookmarksRouting.swift */; };
@@ -228,6 +230,8 @@
 		F5000000000000000000000A /* PostDetailCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailCoordinator.swift; sourceTree = "<group>"; };
 		F5000000000000000000000B /* PostDetailCoordinatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailCoordinatorView.swift; sourceTree = "<group>"; };
 		F5000000000000000000000C /* PostDetailViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailViewModelTests.swift; sourceTree = "<group>"; };
+		F5000000000000000000000D /* LiquidTagConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidTagConverter.swift; sourceTree = "<group>"; };
+		F5000000000000000000000E /* LiquidTagConverterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidTagConverterTests.swift; sourceTree = "<group>"; };
 		F60000000000000000000001 /* BookmarksState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksState.swift; sourceTree = "<group>"; };
 		F60000000000000000000002 /* BookmarksAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksAction.swift; sourceTree = "<group>"; };
 		F60000000000000000000003 /* BookmarksRouting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksRouting.swift; sourceTree = "<group>"; };
@@ -715,6 +719,7 @@
 			isa = PBXGroup;
 			children = (
 				F50000000000000000000007 /* MarkdownContentView.swift */,
+				F5000000000000000000000D /* LiquidTagConverter.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -988,6 +993,7 @@
 			children = (
 				F6000000000000000000000A /* BookmarksViewModelTests.swift */,
 				F5000000000000000000000C /* PostDetailViewModelTests.swift */,
+				F5000000000000000000000E /* LiquidTagConverterTests.swift */,
 				E30000000000000000000008 /* CommentMapperTests.swift */,
 				A10000000000000000000003 /* NewsViewModelTests.swift */,
 				A10000000000000000000004 /* MockNewsRepository.swift */,
@@ -1174,6 +1180,7 @@
 				F50000000000000000000109 /* PostDetailFlowRoute.swift in Sources */,
 				F50000000000000000000108 /* PostDetailView.swift in Sources */,
 				F50000000000000000000107 /* MarkdownContentView.swift in Sources */,
+				F5000000000000000000010D /* LiquidTagConverter.swift in Sources */,
 				F50000000000000000000106 /* PostDetailViewModel.swift in Sources */,
 				F50000000000000000000105 /* PostDetailRouting.swift in Sources */,
 				F50000000000000000000104 /* PostDetailAction.swift in Sources */,
@@ -1276,6 +1283,7 @@
 			files = (
 				F6000000000000000000010A /* BookmarksViewModelTests.swift in Sources */,
 				F5000000000000000000010C /* PostDetailViewModelTests.swift in Sources */,
+				F5000000000000000000010E /* LiquidTagConverterTests.swift in Sources */,
 				E30000000000000000000108 /* CommentMapperTests.swift in Sources */,
 				A10000000000000000000001 /* NewsViewModelTests.swift in Sources */,
 				A10000000000000000000002 /* MockNewsRepository.swift in Sources */,

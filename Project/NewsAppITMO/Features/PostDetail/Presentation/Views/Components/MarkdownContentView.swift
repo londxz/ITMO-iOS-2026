@@ -9,7 +9,7 @@ struct MarkdownContentView: View {
     init(markdown: String, baseURL: URL?) {
         self.markdown = markdown
         self.baseURL = baseURL
-        content = MarkdownContent(markdown)
+        content = MarkdownContent(LiquidTagConverter.convert(markdown))
     }
 
     var body: some View {
@@ -20,10 +20,14 @@ struct MarkdownContentView: View {
             } else if content.renderMarkdown().isEmpty {
                 Text(markdown)
             } else {
-                // MarkdownUI's nonthrowing CommonMark parser treats unsupported
-                // syntax (including DEV.to Liquid tags) as source text.
                 Markdown(content, baseURL: baseURL)
-                    .markdownTheme(.gitHub)
+                    .markdownTheme(
+                        .gitHub.text {
+                            ForegroundColor(.primary)
+                            BackgroundColor(nil)
+                            FontSize(16)
+                        }
+                    )
             }
         }
         .textSelection(.enabled)

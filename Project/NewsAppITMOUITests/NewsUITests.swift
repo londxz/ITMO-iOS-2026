@@ -297,7 +297,7 @@ final class NewsUITests: XCTestCase {
         let clear = search.buttons.firstMatch
         XCTAssertTrue(clear.exists)
         clear.tap()
-        app.keyboards.buttons.matching(NSPredicate(format: "label IN %@", ["Search", "Поиск", "search"])).firstMatch.tap()
+        app.navigationBars["Закладки"].buttons["Close"].tap()
 
         XCTAssertTrue(card.waitForExistence(timeout: 5))
         card.tap()
