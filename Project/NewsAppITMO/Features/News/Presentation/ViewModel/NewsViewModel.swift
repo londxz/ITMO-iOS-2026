@@ -84,9 +84,18 @@ final class NewsViewModel: ObservableObject {
         let repository = repository
         let pageSize = Self.pageSize
         do {
-            async let dayTop = repository.fetchDayTopPost()
+            async let dayTopRequest = repository.fetchDayTopPost()
             async let fresh = repository.fetchFreshPosts(page: 1, perPage: pageSize)
-            let (heroPost, posts) = try await (dayTop, fresh)
+
+            let posts = try await fresh
+            let heroPost: PostModel?
+            do {
+                heroPost = try await dayTopRequest
+            } catch {
+                guard !Task.isCancelled else { throw error }
+                logger.error("day top load failed: \(String(describing: error), privacy: .public)")
+                heroPost = nil
+            }
 
             guard isCurrentInitialLoad(generation) else { return }
             var newState = state

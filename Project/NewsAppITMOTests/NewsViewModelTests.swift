@@ -44,26 +44,39 @@ final class NewsViewModelTests: XCTestCase {
         }
     }
 
-    func testDayTopFailureProducesError() async throws {
-        try await assertFirstLoadFailure(.dayTop)
+    func testDayTopFailureStillPublishesFreshPostsWithoutHero() async throws {
+        try await withViewModel { sut, repository in
+            let posts = makePage()
+            let task = try XCTUnwrap(sut.send(.onAppear))
+            let heroRequest = try await repository.waitForRequest(.dayTop)
+            let freshRequest = try await repository.waitForRequest(.fresh(page: 1, perPage: 20))
+
+            try await repository.fail(
+                heroRequest,
+                error: NetworkError.transport(.notConnectedToInternet)
+            )
+            try await repository.succeed(freshRequest, posts: posts)
+            await task.value
+
+            XCTAssertNil(sut.state.heroPost)
+            XCTAssertEqual(sut.state.posts, posts)
+            XCTAssertEqual(sut.state.initialLoad, .loaded)
+            XCTAssertEqual(sut.state.currentPage, 1)
+            XCTAssertTrue(sut.state.canLoadMore)
+            await assertRequestCount(2, repository: repository)
+        }
     }
 
     func testFreshPostsFailureProducesError() async throws {
-        try await assertFirstLoadFailure(.fresh(page: 1, perPage: 20))
-    }
-
-    private func assertFirstLoadFailure(_ failingKind: MockNewsRepository.Kind) async throws {
         try await withViewModel { sut, repository in
             let task = try XCTUnwrap(sut.send(.onAppear))
             let heroRequest = try await repository.waitForRequest(.dayTop)
             let freshRequest = try await repository.waitForRequest(.fresh(page: 1, perPage: 20))
-            if failingKind == .dayTop {
-                try await repository.fail(heroRequest, error: NetworkError.transport(.notConnectedToInternet))
-                try await repository.succeed(freshRequest, posts: makePage())
-            } else {
-                try await repository.succeed(heroRequest, hero: makePost("hero"))
-                try await repository.fail(freshRequest, error: NetworkError.transport(.notConnectedToInternet))
-            }
+            try await repository.succeed(heroRequest, hero: makePost("hero"))
+            try await repository.fail(
+                freshRequest,
+                error: NetworkError.transport(.notConnectedToInternet)
+            )
             await task.value
 
             XCTAssertEqual(sut.state.initialLoad, .failed(.networkUnavailable))
@@ -239,8 +252,8 @@ final class NewsViewModelTests: XCTestCase {
             let task = try XCTUnwrap(sut.send(.refresh))
             let hero = try await repository.waitForRequest(.dayTop, occurrence: 2)
             let fresh = try await repository.waitForRequest(.fresh(page: 1, perPage: 20), occurrence: 2)
-            try await repository.fail(hero, error: NetworkError.decoding)
-            try await repository.succeed(fresh, posts: makePage("unused"))
+            try await repository.succeed(hero, hero: makePost("unused-hero"))
+            try await repository.fail(fresh, error: NetworkError.decoding)
             await task.value
             XCTAssertEqual(sut.state, previous)
 
@@ -252,13 +265,33 @@ final class NewsViewModelTests: XCTestCase {
         }
     }
 
+    func testRefreshWithDayTopFailureReplacesFeedWithoutHero() async throws {
+        try await withViewModel { sut, repository in
+            try await load(sut, repository, hero: makePost("old-hero"), posts: makePage())
+            let task = try XCTUnwrap(sut.send(.refresh))
+            let hero = try await repository.waitForRequest(.dayTop, occurrence: 2)
+            let fresh = try await repository.waitForRequest(.fresh(page: 1, perPage: 20), occurrence: 2)
+            let refreshedPosts = makePage("refreshed")
+
+            try await repository.fail(hero, error: NetworkError.serverUnavailable(statusCode: 503))
+            try await repository.succeed(fresh, posts: refreshedPosts)
+            await task.value
+
+            XCTAssertNil(sut.state.heroPost)
+            XCTAssertEqual(sut.state.posts, refreshedPosts)
+            XCTAssertEqual(sut.state.initialLoad, .loaded)
+            XCTAssertEqual(sut.state.currentPage, 1)
+            XCTAssertTrue(sut.state.canLoadMore)
+        }
+    }
+
     func testRefreshRecoversFromInitialFailure() async throws {
         try await withViewModel { sut, repository in
             let initial = try XCTUnwrap(sut.send(.onAppear))
             let hero = try await repository.waitForRequest(.dayTop)
             let fresh = try await repository.waitForRequest(.fresh(page: 1, perPage: 20))
-            try await repository.fail(hero, error: NetworkError.decoding)
-            try await repository.succeed(fresh, posts: [])
+            try await repository.succeed(hero, hero: makePost("unused-hero"))
+            try await repository.fail(fresh, error: NetworkError.decoding)
             await initial.value
             XCTAssertEqual(sut.state.initialLoad, .failed(.invalidData))
 
