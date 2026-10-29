@@ -19,7 +19,7 @@ struct CommentsSheetView: View {
                 content
             }
             .refreshable {
-                await viewModel.send(.refresh)?.value
+                await viewModel.refresh()
             }
             .navigationTitle("Комментарии (\(viewModel.state.totalCount))")
             .navigationBarTitleDisplayMode(.inline)

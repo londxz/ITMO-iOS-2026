@@ -86,7 +86,7 @@ struct NewsView: View {
             }
         }
         .refreshable {
-            await viewModel.send(.refresh)?.value
+            await viewModel.refresh()
         }
     }
 

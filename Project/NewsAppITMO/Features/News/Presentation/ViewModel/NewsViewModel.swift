@@ -21,6 +21,7 @@ final class NewsViewModel: ObservableObject {
 
     private var initialLoadTask: Task<Void, Never>?
     private var paginationTask: Task<Void, Never>?
+    private var initialLoadGeneration: UUID?
 
     init(repository: any NewsRepository, router: (any NewsRouting)?) {
         self.repository = repository
@@ -49,22 +50,37 @@ final class NewsViewModel: ObservableObject {
         }
     }
 
+    func refresh() async {
+        let generation = prepareInitialLoad()
+        await loadFirstPage(generation: generation)
+    }
+
     private func startInitialLoad() -> Task<Void, Never> {
-        initialLoadTask?.cancel()
-        paginationTask?.cancel()
-        state.paginationLoad = .idle
-        if state.isEmpty {
-            state.initialLoad = .loading
-        }
+        let generation = prepareInitialLoad()
         let task = Task { [weak self] in
             guard let self else { return }
-            await self.loadFirstPage()
+            await self.loadFirstPage(generation: generation)
         }
         initialLoadTask = task
         return task
     }
 
-    private func loadFirstPage() async {
+    private func prepareInitialLoad() -> UUID {
+        initialLoadTask?.cancel()
+        initialLoadTask = nil
+        paginationTask?.cancel()
+        paginationTask = nil
+        state.paginationLoad = .idle
+        if state.isEmpty {
+            state.initialLoad = .loading
+        }
+        let generation = UUID()
+        initialLoadGeneration = generation
+        return generation
+    }
+
+    private func loadFirstPage(generation: UUID) async {
+        defer { finishInitialLoad(generation: generation) }
         let repository = repository
         let pageSize = Self.pageSize
         do {
@@ -72,7 +88,7 @@ final class NewsViewModel: ObservableObject {
             async let fresh = repository.fetchFreshPosts(page: 1, perPage: pageSize)
             let (heroPost, posts) = try await (dayTop, fresh)
 
-            guard !Task.isCancelled else { return }
+            guard isCurrentInitialLoad(generation) else { return }
             var newState = state
             newState.heroPost = heroPost
             newState.posts = posts.filter { $0.id != heroPost?.id }
@@ -81,18 +97,17 @@ final class NewsViewModel: ObservableObject {
             newState.initialLoad = .loaded
             state = newState
         } catch {
-            guard !Task.isCancelled else { return }
+            guard isCurrentInitialLoad(generation) else { return }
             logger.error("first page load failed: \(String(describing: error), privacy: .public)")
             if state.isEmpty {
                 state.initialLoad = .failed(AppError(error))
             }
         }
-        initialLoadTask = nil
     }
 
     private func startPagination() -> Task<Void, Never>? {
         guard state.initialLoad == .loaded,
-              initialLoadTask == nil,
+              initialLoadGeneration == nil,
               state.paginationLoad != .loading,
               state.canLoadMore
         else { return nil }
@@ -134,12 +149,24 @@ final class NewsViewModel: ObservableObject {
     private func cancelLoading() {
         initialLoadTask?.cancel()
         initialLoadTask = nil
+        initialLoadGeneration = nil
         paginationTask?.cancel()
+        paginationTask = nil
         if state.initialLoad == .loading {
             state.initialLoad = .idle
         }
         if state.paginationLoad == .loading {
             state.paginationLoad = .idle
         }
+    }
+
+    private func isCurrentInitialLoad(_ generation: UUID) -> Bool {
+        initialLoadGeneration == generation && !Task.isCancelled
+    }
+
+    private func finishInitialLoad(generation: UUID) {
+        guard initialLoadGeneration == generation else { return }
+        initialLoadGeneration = nil
+        initialLoadTask = nil
     }
 }
