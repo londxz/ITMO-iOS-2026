@@ -16,7 +16,7 @@ final class NewsCoordinator: ObservableObject, NewsRouting {
         path.append(NewsFlowRoute.postDetail(id: id))
     }
 
-    func openAuthor(id: String, username: String) {
+    func openAuthor(id: String?, username: String) {
         path.append(NewsFlowRoute.authorProfile(id: id, username: username))
     }
 }

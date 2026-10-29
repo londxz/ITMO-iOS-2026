@@ -1,9 +1,9 @@
 enum PostDetailFlowRoute: Hashable, Identifiable {
-    case author(id: String, username: String)
+    case author(id: String?, username: String)
 
     var id: String {
         switch self {
-        case .author(let id, let username): "author-\(id)-\(username)"
+        case .author(_, let username): "author-\(username)"
         }
     }
 }

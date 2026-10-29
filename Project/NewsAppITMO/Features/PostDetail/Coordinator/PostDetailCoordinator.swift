@@ -5,7 +5,7 @@ final class PostDetailCoordinator: ObservableObject, PostDetailRouting {
     @Published var authorRoute: PostDetailFlowRoute?
     @Published var commentsRoute: CommentsSheetRoute?
 
-    func openAuthor(id: String, username: String) {
+    func openAuthor(id: String?, username: String) {
         authorRoute = .author(id: id, username: username)
     }
 

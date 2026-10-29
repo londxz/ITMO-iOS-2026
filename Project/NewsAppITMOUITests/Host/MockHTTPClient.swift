@@ -82,9 +82,13 @@ actor MockHTTPClient: HTTPClient {
         if let endpoint = endpoint as? AuthorEndpoint {
             let json: Any
             switch endpoint {
-            case .profile(let id):
+            case .profile, .profileByUsername:
+                var profileID = 1
+                if case .profile(let id) = endpoint {
+                    profileID = Int(id) ?? 1
+                }
                 json = [
-                    "id": Int(id) ?? 1,
+                    "id": profileID,
                     "username": "test-author",
                     "name": "Тестовый автор",
                     "summary": "Пишу тестовые статьи",
@@ -129,7 +133,7 @@ actor MockHTTPClient: HTTPClient {
             case .initialErrorThenSuccess where attempt == 1:
                 throw NetworkError.transport(.notConnectedToInternet)
             case .paginationErrorThenSuccess where page == 2 && attempt == 1:
-                throw NetworkError.serverUnavailable(statusCode: 503)
+                throw NetworkError.serverError(statusCode: 503)
             case .pagination, .paginationErrorThenSuccess:
                 switch page {
                 case 1: articles = (1...20).map { article($0) }

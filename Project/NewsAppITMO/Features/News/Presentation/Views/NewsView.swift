@@ -25,6 +25,7 @@ struct NewsView: View {
             .navigationBarTitleDisplayMode(.large)
             .task { viewModel.send(.onAppear) }
             .onDisappear { viewModel.send(.onDisappear) }
+            .refreshErrorAlert(viewModel.state.refreshError) { viewModel.send(.dismissRefreshError) }
     }
 
     @ViewBuilder

@@ -18,6 +18,21 @@ final class PostDetailViewModelTests: XCTestCase {
         XCTAssertEqual(vm.state.post?.bodyMarkdown, "# Heading\n\n```swift\nlet value = 1\n```")
         XCTAssertEqual(vm.state.loadState, .loaded)
         XCTAssertTrue(vm.state.isBookmarked)
+        XCTAssertNil(vm.state.refreshError)
+    }
+
+    func testRefreshOfSavedArticleReportsFailureButKeepsArticle() async {
+        let storage = DetailTestBookmarks(posts: [makePost()])
+        let repository = DetailTestRepository(result: .success(makePost(title: "Online")))
+        let viewModel = makeViewModel(repository, storage)
+        await viewModel.send(.onAppear)?.value
+        await repository.setResult(.failure(.transport(.notConnectedToInternet)))
+        await viewModel.send(.refresh)?.value
+        XCTAssertEqual(viewModel.state.post?.title, "Online")
+        XCTAssertEqual(viewModel.state.loadState, .loaded)
+        XCTAssertEqual(viewModel.state.refreshError, .networkUnavailable)
+        viewModel.send(.dismissRefreshError)
+        XCTAssertNil(viewModel.state.refreshError)
     }
 
     func testIncompleteSavedArticleDoesNotHideNetworkError() async {
@@ -59,14 +74,16 @@ final class PostDetailViewModelTests: XCTestCase {
         let repository = DetailTestRepository(result: .success(makePost()))
         let vm = makeViewModel(repository, DetailTestBookmarks())
         await vm.send(.onAppear)?.value
-        await repository.setResult(.failure(.serverUnavailable(statusCode: 503)))
+        await repository.setResult(.failure(.serverError(statusCode: 503)))
         await vm.send(.refresh)?.value
         XCTAssertEqual(vm.state.post, makePost())
-        XCTAssertEqual(vm.state.loadState, .failed(.serverUnavailable))
+        XCTAssertEqual(vm.state.loadState, .loaded)
+        XCTAssertEqual(vm.state.refreshError, .serverUnavailable)
         await repository.setResult(.success(makePost(title: "Recovered")))
         await vm.send(.retry)?.value
         XCTAssertEqual(vm.state.post?.title, "Recovered")
         XCTAssertEqual(vm.state.loadState, .loaded)
+        XCTAssertNil(vm.state.refreshError)
     }
 
     func testBookmarkWritesAreNotOptimisticAndFinishAfterLeaving() async {
@@ -223,7 +240,7 @@ private final class DetailTestRouter: PostDetailRouting {
     var authorID: String?
     var username: String?
     var commentsID: String?
-    func openAuthor(id: String, username: String) { authorID = id; self.username = username }
+    func openAuthor(id: String?, username: String) { authorID = id; self.username = username }
     func openComments(postID: String) { commentsID = postID }
 }
 

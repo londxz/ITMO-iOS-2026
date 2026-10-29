@@ -8,6 +8,7 @@ struct CommentThreadItem: Identifiable, Equatable, Sendable {
 struct CommentsState: Equatable, Sendable {
     var comments: [CommentModel] = []
     var loadState: LoadState = .idle
+    var refreshError: AppError?
 
     var threadItems: [CommentThreadItem] {
         var items: [CommentThreadItem] = []

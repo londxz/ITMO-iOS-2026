@@ -11,7 +11,7 @@ enum ArticleMapper {
     static func toDomain(_ dto: ArticleDTO) -> PostModel {
         let imageURL = dto.coverImage ?? dto.socialImage
         let author = AuthorModel(
-            id: "\(dto.user.userId ?? 0)",
+            id: dto.user.userId.map { String($0) },
             username: dto.user.username,
             name: dto.user.name,
             avatarURL: dto.user.profileImage.flatMap(URL.init(string:)),

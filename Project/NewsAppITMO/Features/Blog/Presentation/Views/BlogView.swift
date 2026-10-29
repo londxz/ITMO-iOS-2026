@@ -34,6 +34,7 @@ struct BlogView: View {
         }
         .task { viewModel.send(.onAppear) }
         .onDisappear { viewModel.send(.onDisappear) }
+        .refreshErrorAlert(viewModel.state.refreshError) { viewModel.send(.dismissRefreshError) }
     }
 
     private var tagBar: some View {

@@ -7,4 +7,5 @@ enum PostDetailAction: Sendable {
     case didSelectAuthor
     case didSelectComments
     case dismissMessage
+    case dismissRefreshError
 }

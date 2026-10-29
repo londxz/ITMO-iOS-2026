@@ -12,3 +12,17 @@ project.xcworkspace/xcuserdata/
 build/
 DerivedData/
 .build/
+*.xcresult
+
+# IDE
+.idea/
+.vscode/
+
+# Secrets and signing
+.env
+.env.*
+*.secrets
+Secrets.xcconfig
+*.p12
+*.mobileprovision
+*.cer

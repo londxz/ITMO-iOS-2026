@@ -3,4 +3,5 @@ enum CommentsAction: Sendable {
     case onDisappear
     case retry
     case refresh
+    case dismissRefreshError
 }

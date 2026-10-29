@@ -2,14 +2,14 @@ import SwiftUI
 
 struct AuthorCoordinatorView: View {
     @StateObject private var coordinator: AuthorCoordinator
-    private let authorID: String
+    private let authorID: String?
     private let username: String
     private let repository: any AuthorRepository
     private let imageCache: any ImageCache
     private let screenFactory: any ScreenFactory
 
     init(
-        authorID: String,
+        authorID: String?,
         username: String,
         coordinator: AuthorCoordinator,
         repository: any AuthorRepository,
