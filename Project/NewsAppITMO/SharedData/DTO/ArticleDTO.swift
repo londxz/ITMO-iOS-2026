@@ -14,6 +14,7 @@ struct ArticleDTO: Decodable, Sendable {
     let bodyMarkdown: String?
     let publishedAt: Date
     let coverImage: String?
+    let socialImage: String?
     let readingTimeMinutes: Int
     let publicReactionsCount: Int
     let commentsCount: Int
@@ -26,6 +27,7 @@ struct ArticleDTO: Decodable, Sendable {
         case bodyMarkdown = "body_markdown"
         case publishedAt = "published_at"
         case coverImage = "cover_image"
+        case socialImage = "social_image"
         case readingTimeMinutes = "reading_time_minutes"
         case publicReactionsCount = "public_reactions_count"
         case commentsCount = "comments_count"
@@ -41,6 +43,7 @@ struct ArticleDTO: Decodable, Sendable {
         bodyMarkdown = try container.decodeIfPresent(String.self, forKey: .bodyMarkdown)
         publishedAt = try container.decode(Date.self, forKey: .publishedAt)
         coverImage = try container.decodeIfPresent(String.self, forKey: .coverImage)
+        socialImage = try container.decodeIfPresent(String.self, forKey: .socialImage)
         readingTimeMinutes = try container.decode(Int.self, forKey: .readingTimeMinutes)
         publicReactionsCount = try container.decode(Int.self, forKey: .publicReactionsCount)
         commentsCount = try container.decode(Int.self, forKey: .commentsCount)

@@ -9,6 +9,7 @@ import Foundation
 
 enum ArticleMapper {
     static func toDomain(_ dto: ArticleDTO) -> PostModel {
+        let imageURL = dto.coverImage ?? dto.socialImage
         let author = AuthorModel(
             id: "\(dto.user.userId ?? 0)",
             username: dto.user.username,
@@ -26,7 +27,7 @@ enum ArticleMapper {
             summary: dto.description ?? "",
             bodyMarkdown: dto.bodyMarkdown,
             publishedAt: dto.publishedAt,
-            coverImageURL: dto.coverImage.flatMap(URL.init(string:)),
+            coverImageURL: imageURL.flatMap(URL.init(string:)),
             readingTimeMinutes: dto.readingTimeMinutes,
             reactionsCount: dto.publicReactionsCount,
             commentsCount: dto.commentsCount,

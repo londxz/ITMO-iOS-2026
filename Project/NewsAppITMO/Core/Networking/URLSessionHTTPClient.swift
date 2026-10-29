@@ -39,6 +39,7 @@ final class URLSessionHTTPClient: HTTPClient, Sendable {
         endpoint.headers.forEach { key, value in
             request.setValue(value, forHTTPHeaderField: key)
         }
+        request.setValue("identity", forHTTPHeaderField: "Accept-Encoding")
 
         let data: Data
         let response: URLResponse
