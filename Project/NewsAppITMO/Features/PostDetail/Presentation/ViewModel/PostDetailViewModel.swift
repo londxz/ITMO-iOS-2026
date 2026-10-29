@@ -10,6 +10,7 @@ final class PostDetailViewModel: ObservableObject {
     private let bookmarksStorage: any BookmarksStorage
     private weak var router: (any PostDetailRouting)?
     private var loadTask: Task<Void, Never>?
+    private var loadGeneration: UUID?
     private var bookmarkTask: Task<Void, Never>?
     private var bookmarkWriteStarted = false
     private var bookmarkRevision = 0
@@ -44,6 +45,7 @@ final class PostDetailViewModel: ObservableObject {
         case .onDisappear:
             loadTask?.cancel()
             loadTask = nil
+            loadGeneration = nil
             if state.loadState == .loading {
                 state.loadState = state.post == nil ? .idle : .loaded
             }
@@ -69,55 +71,82 @@ final class PostDetailViewModel: ObservableObject {
         }
     }
 
+    func refresh() async {
+        let generation = prepareLoading()
+        await load(generation: generation)
+    }
+
     private func startLoading() -> Task<Void, Never> {
+        let generation = prepareLoading()
+        let task = Task { [weak self] in
+            guard let self else { return }
+            await self.load(generation: generation)
+        }
+        loadTask = task
+        return task
+    }
+
+    private func prepareLoading() -> UUID {
         loadTask?.cancel()
+        loadTask = nil
         state.loadState = .loading
+        let generation = UUID()
+        loadGeneration = generation
+        return generation
+    }
+
+    private func load(generation: UUID) async {
+        defer { finishLoading(generation: generation) }
         let repository = repository
         let storage = bookmarksStorage
         let postID = postID
         let revision = bookmarkRevision
 
-        let task = Task { [weak self] in
-            let savedPost: PostModel?
-            do {
-                savedPost = try await storage.getBookmarks().first { $0.id == postID }
-                guard !Task.isCancelled else { return }
-                if let self {
-                    if self.bookmarkRevision == revision && self.bookmarkTask == nil {
-                        self.state.isBookmarked = savedPost != nil
-                    }
-                    if self.state.post == nil, Self.hasBody(savedPost) {
-                        self.state.post = savedPost
-                    }
-                }
-            } catch {
-                // A damaged local file must not prevent a successful network load.
-                savedPost = nil
+        let savedPost: PostModel?
+        do {
+            savedPost = try await storage.getBookmarks().first { $0.id == postID }
+            guard isCurrentLoad(generation) else { return }
+            if bookmarkRevision == revision && bookmarkTask == nil {
+                state.isBookmarked = savedPost != nil
             }
-            guard !Task.isCancelled else { return }
+            if state.post == nil, Self.hasBody(savedPost) {
+                state.post = savedPost
+            }
+        } catch {
+            // A damaged local file must not prevent a successful network load.
+            savedPost = nil
+        }
+        guard isCurrentLoad(generation) else { return }
 
-            do {
-                let post = try await repository.fetchPost(id: postID)
-                guard !Task.isCancelled, let self else { return }
-                self.state.post = post
-                self.state.loadState = .loaded
-                self.loadTask = nil
-            } catch {
-                guard !Task.isCancelled, let self else { return }
-                if Self.isCancellation(error) {
-                    self.state.loadState = self.state.post == nil ? .idle : .loaded
-                } else if Self.hasBody(savedPost) {
-                    // Keep an already-visible, newer version when refreshing.
-                    if self.state.post == nil { self.state.post = savedPost }
-                    self.state.loadState = .loaded
-                } else {
-                    self.state.loadState = .failed(AppError(error))
+        do {
+            let post = try await repository.fetchPost(id: postID)
+            guard isCurrentLoad(generation) else { return }
+            state.post = post
+            state.loadState = .loaded
+        } catch {
+            guard isCurrentLoad(generation) else { return }
+            if Self.isCancellation(error) {
+                state.loadState = state.post == nil ? .idle : .loaded
+            } else if Self.hasBody(savedPost) {
+                // Keep an already-visible, newer version when refreshing.
+                if state.post == nil {
+                    state.post = savedPost
                 }
-                self.loadTask = nil
+                state.loadState = .loaded
+            } else {
+                state.loadState = .failed(AppError(error))
             }
         }
-        loadTask = task
-        return task
+    }
+
+    private func isCurrentLoad(_ generation: UUID) -> Bool {
+        loadGeneration == generation && !Task.isCancelled
+    }
+
+    private func finishLoading(generation: UUID) {
+        guard loadGeneration == generation else { return }
+        loadGeneration = nil
+        loadTask = nil
     }
 
     private func toggleBookmark() -> Task<Void, Never>? {

@@ -15,6 +15,7 @@ final class BlogViewModel: ObservableObject {
     private var initialLoadTask: Task<Void, Never>?
     private var paginationTask: Task<Void, Never>?
     private var generationID = UUID()
+    private var initialLoadGeneration: UUID?
 
     init(repository: any BlogRepository, router: (any BlogRouting)?) {
         self.repository = repository
@@ -51,6 +52,11 @@ final class BlogViewModel: ObservableObject {
         }
     }
 
+    func refresh() async {
+        let generation = prepareFirstPageLoad()
+        await loadFirstPage(generation: generation, reloadTags: true)
+    }
+
     private func restartFeed() -> Task<Void, Never> {
         var newState = state
         newState.posts = []
@@ -62,14 +68,7 @@ final class BlogViewModel: ObservableObject {
     }
 
     private func startFirstPageLoad(reloadTags: Bool) -> Task<Void, Never> {
-        initialLoadTask?.cancel()
-        paginationTask?.cancel()
-        let generation = UUID()
-        generationID = generation
-        state.paginationLoad = .idle
-        if state.initialLoad != .loaded {
-            state.initialLoad = .loading
-        }
+        let generation = prepareFirstPageLoad()
         let task = Task { [weak self] in
             guard let self else { return }
             await self.loadFirstPage(generation: generation, reloadTags: reloadTags)
@@ -78,7 +77,23 @@ final class BlogViewModel: ObservableObject {
         return task
     }
 
+    private func prepareFirstPageLoad() -> UUID {
+        initialLoadTask?.cancel()
+        initialLoadTask = nil
+        paginationTask?.cancel()
+        paginationTask = nil
+        let generation = UUID()
+        generationID = generation
+        initialLoadGeneration = generation
+        state.paginationLoad = .idle
+        if state.initialLoad != .loaded {
+            state.initialLoad = .loading
+        }
+        return generation
+    }
+
     private func loadFirstPage(generation: UUID, reloadTags: Bool) async {
+        defer { finishInitialLoad(generation: generation) }
         let repository = repository
         let tag = state.selectedTag?.name
         let sort = state.selectedSort
@@ -117,12 +132,11 @@ final class BlogViewModel: ObservableObject {
                 state.initialLoad = .failed(AppError(error))
             }
         }
-        initialLoadTask = nil
     }
 
     private func startPagination() -> Task<Void, Never>? {
         guard state.initialLoad == .loaded,
-              initialLoadTask == nil,
+              initialLoadGeneration == nil,
               state.paginationLoad != .loading,
               state.canLoadMore
         else { return nil }
@@ -169,7 +183,9 @@ final class BlogViewModel: ObservableObject {
     private func cancelLoading() {
         initialLoadTask?.cancel()
         initialLoadTask = nil
+        initialLoadGeneration = nil
         paginationTask?.cancel()
+        paginationTask = nil
         generationID = UUID()
         if state.initialLoad == .loading {
             state.initialLoad = .idle
@@ -181,6 +197,12 @@ final class BlogViewModel: ObservableObject {
 
     private func isCurrent(_ generation: UUID) -> Bool {
         generation == generationID && !Task.isCancelled
+    }
+
+    private func finishInitialLoad(generation: UUID) {
+        guard initialLoadGeneration == generation else { return }
+        initialLoadGeneration = nil
+        initialLoadTask = nil
     }
 
     private static func tags(

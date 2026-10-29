@@ -97,7 +97,7 @@ struct PostDetailView: View {
                 .padding(.bottom)
             }
         }
-        .refreshable { await viewModel.send(.refresh)?.value }
+        .refreshable { await viewModel.refresh() }
     }
 
     private func cover(_ url: URL?) -> some View {
