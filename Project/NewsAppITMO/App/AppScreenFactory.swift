@@ -27,7 +27,7 @@ final class AppScreenFactory: ScreenFactory {
         ))
     }
 
-    func makeAuthorProfileView(id: String, username: String) -> AnyView {
+    func makeAuthorProfileView(id: String?, username: String) -> AnyView {
         let repository = AuthorRepositoryImpl(client: container.httpClient)
         return AnyView(AuthorCoordinatorView(
             authorID: id,

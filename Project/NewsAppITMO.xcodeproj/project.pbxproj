@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D70000000000000000000108 /* LoadingPrimitivesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70000000000000000000008 /* LoadingPrimitivesTests.swift */; };
+		D70000000000000000000107 /* TaskSlot.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70000000000000000000007 /* TaskSlot.swift */; };
+		D70000000000000000000106 /* RequestGeneration.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70000000000000000000006 /* RequestGeneration.swift */; };
+		D70000000000000000000105 /* HTTPClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70000000000000000000005 /* HTTPClientTests.swift */; };
+		D70000000000000000000104 /* RefreshErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70000000000000000000004 /* RefreshErrorTests.swift */; };
+		D70000000000000000000103 /* RefreshErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70000000000000000000003 /* RefreshErrorAlert.swift */; };
+		D70000000000000000000102 /* ImageCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70000000000000000000002 /* ImageCacheTests.swift */; };
+		D70000000000000000000101 /* AuthorIdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70000000000000000000001 /* AuthorIdentityTests.swift */; };
 		0405C06156642E6B488B373D /* BlogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43F29DDE19E4CF607645636F /* BlogView.swift */; };
 		077994A360ADE819DFE3001D /* NewsHeroCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DC335F43AC365002D0D67D6 /* NewsHeroCardView.swift */; };
 		082F0F06E907A9C5FA55CF3B /* AuthorPostRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E90BC3EAAB255057F8C388E /* AuthorPostRowView.swift */; };
@@ -149,6 +157,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D70000000000000000000008 /* LoadingPrimitivesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingPrimitivesTests.swift; sourceTree = "<group>"; };
+		D70000000000000000000007 /* TaskSlot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskSlot.swift; sourceTree = "<group>"; };
+		D70000000000000000000006 /* RequestGeneration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestGeneration.swift; sourceTree = "<group>"; };
+		D70000000000000000000005 /* HTTPClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClientTests.swift; sourceTree = "<group>"; };
+		D70000000000000000000004 /* RefreshErrorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshErrorTests.swift; sourceTree = "<group>"; };
+		D70000000000000000000003 /* RefreshErrorAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshErrorAlert.swift; sourceTree = "<group>"; };
+		D70000000000000000000002 /* ImageCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCacheTests.swift; sourceTree = "<group>"; };
+		D70000000000000000000001 /* AuthorIdentityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorIdentityTests.swift; sourceTree = "<group>"; };
 		023675CD59AB377B2F094DA7 /* BlogCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlogCardView.swift; sourceTree = "<group>"; };
 		027C423683E40CE1D71F22E7 /* BlogAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlogAction.swift; sourceTree = "<group>"; };
 		0DEE786C0367BED584B0BD43 /* BlogSort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlogSort.swift; sourceTree = "<group>"; };
@@ -455,6 +471,8 @@
 			isa = PBXGroup;
 			children = (
 				3C6401A5307686650062B044 /* LoadState.swift */,
+				D70000000000000000000007 /* TaskSlot.swift */,
+				D70000000000000000000006 /* RequestGeneration.swift */,
 				3C6401A73076868D0062B044 /* AppError.swift */,
 			);
 			path = Types;
@@ -512,6 +530,7 @@
 			children = (
 				EE4B6E2F964FEFBD6ACB2403 /* LoadingView.swift */,
 				975C4E2FBC974C189F532440 /* ErrorView.swift */,
+				D70000000000000000000003 /* RefreshErrorAlert.swift */,
 				FC4091C6FE0054E1A86A39BF /* EmptyStateView.swift */,
 				F74A83CEEFA17C12DF7D0100 /* RelativeTimeText.swift */,
 				D20000000000000000000013 /* CachedAsyncImage.swift */,
@@ -1004,6 +1023,11 @@
 				F5000000000000000000000C /* PostDetailViewModelTests.swift */,
 				F5000000000000000000000E /* LiquidTagConverterTests.swift */,
 				E30000000000000000000008 /* CommentMapperTests.swift */,
+				D70000000000000000000008 /* LoadingPrimitivesTests.swift */,
+				D70000000000000000000005 /* HTTPClientTests.swift */,
+				D70000000000000000000004 /* RefreshErrorTests.swift */,
+				D70000000000000000000002 /* ImageCacheTests.swift */,
+				D70000000000000000000001 /* AuthorIdentityTests.swift */,
 				A10000000000000000000003 /* NewsViewModelTests.swift */,
 				A10000000000000000000004 /* MockNewsRepository.swift */,
 			);
@@ -1256,6 +1280,8 @@
 				3C6401D5307698300062B044 /* AppScreenFactory.swift in Sources */,
 				3C6401D73076986B0062B044 /* NewsFlowRoute.swift in Sources */,
 				3C6401A63076866B0062B044 /* LoadState.swift in Sources */,
+				D70000000000000000000107 /* TaskSlot.swift in Sources */,
+				D70000000000000000000106 /* RequestGeneration.swift in Sources */,
 				3C6401DB307698A50062B044 /* NewsCoordinatorView.swift in Sources */,
 				3C6401CE3076960F0062B044 /* APIPath.swift in Sources */,
 				3C6401A8307686910062B044 /* AppError.swift in Sources */,
@@ -1280,6 +1306,7 @@
 				3C6401BA30768EB50062B044 /* TagDTO.swift in Sources */,
 				F9ED34D1CF5CC8EB4305EFCE /* LoadingView.swift in Sources */,
 				A4D86F777EE634A6152D4BA8 /* ErrorView.swift in Sources */,
+				D70000000000000000000103 /* RefreshErrorAlert.swift in Sources */,
 				509D9D7E1AB86E1FABE04FCB /* EmptyStateView.swift in Sources */,
 				F4B7BD1BA918580F391F6508 /* RelativeTimeText.swift in Sources */,
 				B3C32AE04AACC8395C26ABFC /* NewsEndpoint.swift in Sources */,
@@ -1339,6 +1366,11 @@
 				F5000000000000000000010C /* PostDetailViewModelTests.swift in Sources */,
 				F5000000000000000000010E /* LiquidTagConverterTests.swift in Sources */,
 				E30000000000000000000108 /* CommentMapperTests.swift in Sources */,
+				D70000000000000000000108 /* LoadingPrimitivesTests.swift in Sources */,
+				D70000000000000000000105 /* HTTPClientTests.swift in Sources */,
+				D70000000000000000000104 /* RefreshErrorTests.swift in Sources */,
+				D70000000000000000000102 /* ImageCacheTests.swift in Sources */,
+				D70000000000000000000101 /* AuthorIdentityTests.swift in Sources */,
 				A10000000000000000000001 /* NewsViewModelTests.swift in Sources */,
 				A10000000000000000000002 /* MockNewsRepository.swift in Sources */,
 			);
@@ -1432,7 +1464,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -1490,7 +1522,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;

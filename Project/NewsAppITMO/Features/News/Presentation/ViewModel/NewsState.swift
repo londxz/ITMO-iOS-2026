@@ -12,6 +12,7 @@ struct NewsState: Equatable, Sendable {
     var paginationLoad: LoadState = .idle
     var currentPage: Int = 1
     var canLoadMore: Bool = true
+    var refreshError: AppError?
 
     var isEmpty: Bool {
         heroPost == nil && posts.isEmpty

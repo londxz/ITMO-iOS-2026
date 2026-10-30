@@ -9,7 +9,7 @@ final class BlogCoordinator: ObservableObject, BlogRouting {
         path.append(BlogFlowRoute.postDetail(id: id))
     }
 
-    func openAuthor(id: String, username: String) {
+    func openAuthor(id: String?, username: String) {
         path.append(BlogFlowRoute.authorProfile(id: id, username: username))
     }
 }

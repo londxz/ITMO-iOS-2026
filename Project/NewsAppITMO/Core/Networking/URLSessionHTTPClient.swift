@@ -6,26 +6,78 @@
 //
 
 import Foundation
+import OSLog
 
 final class URLSessionHTTPClient: HTTPClient, Sendable {
-    private let configuration: APIConfiguration
-    private let session: URLSession
+    typealias Transport = @Sendable (URLRequest) async throws -> (Data, URLResponse)
 
-    init(
+    static let acceptEncodingHeader = "Accept-Encoding"
+    static let encodingBypassingStaleDevToGzipCache = "identity"
+
+    private let configuration: APIConfiguration
+    private let transport: Transport
+    private let logger = Logger(subsystem: "NewsAppITMO", category: "HTTPClient")
+
+    convenience init(
         configuration: APIConfiguration = .devTo,
         session: URLSession = .shared
     ) {
+        self.init(configuration: configuration) { request in
+            try await session.data(for: request)
+        }
+    }
+
+    init(
+        configuration: APIConfiguration = .devTo,
+        transport: @escaping Transport
+    ) {
         self.configuration = configuration
-        self.session = session
+        self.transport = transport
     }
 
     @concurrent
     func send<T: Decodable & Sendable>(_ endpoint: any Endpoint) async throws -> T {
+        let request = try makeRequest(for: endpoint)
+        let path = endpoint.path
+
+        let data: Data
+        let response: URLResponse
+        do {
+            (data, response) = try await transport(request)
+        } catch {
+            let networkError = Task.isCancelled ? .cancelled : NetworkError(error)
+            if networkError != .cancelled {
+                let reason = String(describing: error)
+                logger.error("\(path, privacy: .public): request failed: \(reason, privacy: .public)")
+            }
+            throw networkError
+        }
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            logger.error("\(path, privacy: .public): response is not HTTP")
+            throw NetworkError.invalidResponse
+        }
+
+        if let statusError = NetworkError(statusCode: httpResponse.statusCode) {
+            logger.error("\(path, privacy: .public): HTTP \(httpResponse.statusCode)")
+            throw statusError
+        }
+
+        do {
+            return try Self.makeDecoder().decode(T.self, from: data)
+        } catch {
+            let description = String(describing: error)
+            logger.error("\(path, privacy: .public): decoding failed: \(description, privacy: .public)")
+            throw NetworkError.decoding(description: description)
+        }
+    }
+
+    private func makeRequest(for endpoint: any Endpoint) throws -> URLRequest {
         var components = URLComponents(
             url: configuration.baseURL.appendingPathComponent(endpoint.path),
             resolvingAgainstBaseURL: true
         )
-        
+
         if !endpoint.queryItems.isEmpty {
             components?.queryItems = endpoint.queryItems
         }
@@ -39,52 +91,14 @@ final class URLSessionHTTPClient: HTTPClient, Sendable {
         endpoint.headers.forEach { key, value in
             request.setValue(value, forHTTPHeaderField: key)
         }
-        request.setValue("identity", forHTTPHeaderField: "Accept-Encoding")
-
-        let data: Data
-        let response: URLResponse
-        do {
-            (data, response) = try await session.data(for: request)
-        } catch is CancellationError {
-            throw NetworkError.cancelled
-        } catch let urlError as URLError {
-            if urlError.code == .cancelled {
-                throw NetworkError.cancelled
-            }
-            throw NetworkError.transport(urlError.code)
-        } catch {
-            if Task.isCancelled {
-                throw NetworkError.cancelled
-            }
-            throw NetworkError.unknown
-        }
-
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw NetworkError.invalidResponse
-        }
-
-        switch httpResponse.statusCode {
-        case 200...299:
-            break
-        case 401, 403:
-            throw NetworkError.unauthorized
-        case 404:
-            throw NetworkError.serverUnavailable(statusCode: httpResponse.statusCode)
-        case 500...599:
-            throw NetworkError.serverUnavailable(statusCode: httpResponse.statusCode)
-        default:
-            throw NetworkError.serverUnavailable(statusCode: httpResponse.statusCode)
-        }
-
-        do {
-            let decoder = Self.makeDecoder()
-            return try decoder.decode(T.self, from: data)
-        } catch {
-            throw NetworkError.decoding
-        }
+        request.setValue(
+            Self.encodingBypassingStaleDevToGzipCache,
+            forHTTPHeaderField: Self.acceptEncodingHeader
+        )
+        return request
     }
 
-    private static func makeDecoder() -> JSONDecoder {
+    static func makeDecoder() -> JSONDecoder {
         let fractionalSecondsStyle = Date.ISO8601FormatStyle(
             includingFractionalSeconds: true
         )

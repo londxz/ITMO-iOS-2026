@@ -7,8 +7,8 @@ final class CommentsViewModel: ObservableObject {
 
     private let postID: String
     private let repository: any CommentsRepository
-    private var loadTask: Task<Void, Never>?
-    private var loadGeneration: UUID?
+    private var loadTask = TaskSlot()
+    private var loadGeneration = RequestGeneration()
 
     init(postID: String, repository: any CommentsRepository) {
         self.postID = postID
@@ -16,7 +16,7 @@ final class CommentsViewModel: ObservableObject {
     }
 
     deinit {
-        loadTask?.cancel()
+        loadTask.cancel()
     }
 
     @discardableResult
@@ -27,10 +27,12 @@ final class CommentsViewModel: ObservableObject {
             return startLoading()
         case .retry, .refresh:
             return startLoading()
+        case .dismissRefreshError:
+            state.refreshError = nil
+            return nil
         case .onDisappear:
-            loadTask?.cancel()
-            loadTask = nil
-            loadGeneration = nil
+            loadTask.cancel()
+            loadGeneration.invalidate()
             if state.loadState == .loading {
                 state.loadState = state.isEmpty ? .idle : .loaded
             }
@@ -39,27 +41,20 @@ final class CommentsViewModel: ObservableObject {
     }
 
     func refresh() async {
-        let generation = prepareLoading()
-        await load(generation: generation)
+        await startLoading().value
     }
 
     private func startLoading() -> Task<Void, Never> {
         let generation = prepareLoading()
-        let task = Task { [weak self] in
-            guard let self else { return }
-            await self.load(generation: generation)
-        }
-        loadTask = task
-        return task
+        return loadTask.replace(with: Task { [weak self] in
+            await self?.load(generation: generation)
+        })
     }
 
     private func prepareLoading() -> UUID {
-        loadTask?.cancel()
-        loadTask = nil
+        loadTask.cancel()
         state.loadState = .loading
-        let generation = UUID()
-        loadGeneration = generation
-        return generation
+        return loadGeneration.begin()
     }
 
     private func load(generation: UUID) async {
@@ -68,26 +63,24 @@ final class CommentsViewModel: ObservableObject {
         let postID = postID
         do {
             let comments = try await repository.fetchComments(postID: postID)
-            guard isCurrentLoad(generation) else { return }
+            guard loadGeneration.isCurrent(generation) else { return }
             state = CommentsState(comments: comments, loadState: .loaded)
         } catch {
-            guard isCurrentLoad(generation) else { return }
-            if error is CancellationError || error as? NetworkError == .cancelled
-                || (error as? URLError)?.code == .cancelled {
+            guard loadGeneration.isCurrent(generation) else { return }
+            if NetworkError.isCancellation(error) {
                 state.loadState = state.isEmpty ? .idle : .loaded
-            } else {
+            } else if state.isEmpty {
                 state.loadState = .failed(AppError(error))
+            } else {
+                state.loadState = .loaded
+                state.refreshError = AppError(error)
             }
         }
     }
 
-    private func isCurrentLoad(_ generation: UUID) -> Bool {
-        loadGeneration == generation && !Task.isCancelled
-    }
-
     private func finishLoading(generation: UUID) {
-        guard loadGeneration == generation else { return }
-        loadGeneration = nil
-        loadTask = nil
+        if loadGeneration.end(generation) {
+            loadTask.clear()
+        }
     }
 }

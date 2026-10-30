@@ -8,5 +8,5 @@
 @MainActor
 protocol NewsRouting: AnyObject {
     func openPost(id: String)
-    func openAuthor(id: String, username: String)
+    func openAuthor(id: String?, username: String)
 }

@@ -10,6 +10,7 @@ struct BlogState: Equatable, Sendable {
 
     var currentPage = 1
     var canLoadMore = true
+    var refreshError: AppError?
 
     var isEmpty: Bool {
         posts.isEmpty

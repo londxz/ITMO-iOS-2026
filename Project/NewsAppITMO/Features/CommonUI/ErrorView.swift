@@ -13,41 +13,49 @@ struct ErrorView: View {
 
     var body: some View {
         ContentUnavailableView {
-            Label(title, systemImage: systemImage)
+            Label(error.title, systemImage: error.systemImage)
         } description: {
-            Text(message)
+            Text(error.message)
         } actions: {
             Button("Повторить", action: retry)
                 .buttonStyle(.borderedProminent)
         }
     }
+}
 
-    private var title: String {
-        switch error {
+extension AppError {
+    var title: String {
+        switch self {
         case .networkUnavailable: "Нет подключения"
+        case .accessDenied: "Нет доступа"
+        case .notFound: "Не найдено"
+        case .requestRejected: "Запрос отклонён"
         case .serverUnavailable: "Сервер недоступен"
         case .invalidData: "Ошибка данных"
-        case .notFound: "Не найдено"
         case .unknown: "Что-то пошло не так"
         }
     }
 
-    private var message: String {
-        switch error {
+    var message: String {
+        switch self {
         case .networkUnavailable: "Проверьте интернет и попробуйте ещё раз"
+        case .accessDenied: "Сервер не разрешил получить эти данные"
+        case .notFound: "Запрошенные данные не найдены"
+        case .requestRejected: "Сервер не смог обработать запрос. Попробуйте позже"
         case .serverUnavailable: "Попробуйте чуть позже"
         case .invalidData: "Не удалось прочитать ответ сервера"
-        case .notFound: "Запрошенные данные не найдены"
         case .unknown: "Попробуйте ещё раз"
         }
     }
 
-    private var systemImage: String {
-        switch error {
+    var systemImage: String {
+        switch self {
         case .networkUnavailable: "wifi.slash"
+        case .accessDenied: "lock"
+        case .notFound: "magnifyingglass"
+        case .requestRejected: "exclamationmark.bubble"
         case .serverUnavailable: "exclamationmark.icloud"
         case .invalidData: "doc.badge.ellipsis"
-        case .notFound: "magnifyingglass"
         case .unknown: "exclamationmark.triangle"
         }
     }

@@ -1,7 +1,7 @@
 import Foundation
 
 protocol AuthorRepository: Sendable {
-    func fetchAuthor(id: String) async throws -> AuthorModel
+    func fetchAuthor(id: String?, username: String) async throws -> AuthorModel
 
     func fetchPosts(
         username: String,
@@ -17,8 +17,9 @@ actor AuthorRepositoryImpl: AuthorRepository {
         self.client = client
     }
 
-    func fetchAuthor(id: String) async throws -> AuthorModel {
-        let dto: AuthorProfileDTO = try await client.send(AuthorEndpoint.profile(id: id))
+    func fetchAuthor(id: String?, username: String) async throws -> AuthorModel {
+        let endpoint = id.map { AuthorEndpoint.profile(id: $0) } ?? .profileByUsername(username)
+        let dto: AuthorProfileDTO = try await client.send(endpoint)
         return AuthorMapper.toDomain(dto)
     }
 

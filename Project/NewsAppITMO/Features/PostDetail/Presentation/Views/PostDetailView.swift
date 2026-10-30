@@ -48,10 +48,6 @@ struct PostDetailView: View {
     private func article(_ post: PostModel) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                if case .failed(let error) = viewModel.state.loadState {
-                    ErrorView(error: error) { viewModel.send(.retry) }
-                }
-
                 cover(post.coverImageURL)
 
                 VStack(alignment: .leading, spacing: 20) {
@@ -98,6 +94,7 @@ struct PostDetailView: View {
             }
         }
         .refreshable { await viewModel.refresh() }
+        .refreshErrorAlert(viewModel.state.refreshError) { viewModel.send(.dismissRefreshError) }
     }
 
     private func cover(_ url: URL?) -> some View {

@@ -7,5 +7,5 @@
 
 enum NewsFlowRoute: Hashable, Sendable {
     case postDetail(id: String)
-    case authorProfile(id: String, username: String)
+    case authorProfile(id: String?, username: String)
 }

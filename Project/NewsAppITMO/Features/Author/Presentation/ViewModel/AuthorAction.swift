@@ -3,5 +3,6 @@ enum AuthorAction: Sendable {
     case onDisappear
     case refresh
     case loadMore
+    case dismissRefreshError
     case didSelectPost(id: String)
 }

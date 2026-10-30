@@ -7,4 +7,5 @@ struct AuthorState: Equatable, Sendable {
 
     var currentPage = 1
     var canLoadMore = true
+    var refreshError: AppError?
 }

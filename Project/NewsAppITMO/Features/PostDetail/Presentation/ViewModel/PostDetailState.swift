@@ -4,4 +4,5 @@ struct PostDetailState: Equatable, Sendable {
     var isBookmarked = false
     var bookmarkUpdate: LoadState = .idle
     var message: String?
+    var refreshError: AppError?
 }

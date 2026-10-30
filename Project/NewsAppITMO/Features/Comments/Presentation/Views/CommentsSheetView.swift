@@ -21,6 +21,7 @@ struct CommentsSheetView: View {
             .refreshable {
                 await viewModel.refresh()
             }
+            .refreshErrorAlert(viewModel.state.refreshError) { viewModel.send(.dismissRefreshError) }
             .navigationTitle("Комментарии (\(viewModel.state.totalCount))")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -56,10 +57,6 @@ struct CommentsSheetView: View {
             .frame(maxWidth: .infinity)
         } else {
             LazyVStack(alignment: .leading, spacing: 0) {
-                if case .failed(let error) = viewModel.state.loadState {
-                    ErrorView(error: error) { viewModel.send(.retry) }
-                }
-
                 ForEach(viewModel.state.threadItems) { item in
                     CommentRowView(item: item, imageCache: imageCache)
                     Divider()

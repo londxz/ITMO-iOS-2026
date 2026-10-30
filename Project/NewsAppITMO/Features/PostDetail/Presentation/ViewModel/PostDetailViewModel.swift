@@ -9,8 +9,8 @@ final class PostDetailViewModel: ObservableObject {
     private let repository: any PostDetailRepository
     private let bookmarksStorage: any BookmarksStorage
     private weak var router: (any PostDetailRouting)?
-    private var loadTask: Task<Void, Never>?
-    private var loadGeneration: UUID?
+    private var loadTask = TaskSlot()
+    private var loadGeneration = RequestGeneration()
     private var bookmarkTask: Task<Void, Never>?
     private var bookmarkWriteStarted = false
     private var bookmarkRevision = 0
@@ -28,7 +28,7 @@ final class PostDetailViewModel: ObservableObject {
     }
 
     deinit {
-        loadTask?.cancel()
+        loadTask.cancel()
         bookmarkTask?.cancel()
     }
 
@@ -43,9 +43,8 @@ final class PostDetailViewModel: ObservableObject {
         case .toggleBookmark:
             return toggleBookmark()
         case .onDisappear:
-            loadTask?.cancel()
-            loadTask = nil
-            loadGeneration = nil
+            loadTask.cancel()
+            loadGeneration.invalidate()
             if state.loadState == .loading {
                 state.loadState = state.post == nil ? .idle : .loaded
             }
@@ -68,31 +67,27 @@ final class PostDetailViewModel: ObservableObject {
         case .dismissMessage:
             state.message = nil
             return nil
+        case .dismissRefreshError:
+            state.refreshError = nil
+            return nil
         }
     }
 
     func refresh() async {
-        let generation = prepareLoading()
-        await load(generation: generation)
+        await startLoading().value
     }
 
     private func startLoading() -> Task<Void, Never> {
         let generation = prepareLoading()
-        let task = Task { [weak self] in
-            guard let self else { return }
-            await self.load(generation: generation)
-        }
-        loadTask = task
-        return task
+        return loadTask.replace(with: Task { [weak self] in
+            await self?.load(generation: generation)
+        })
     }
 
     private func prepareLoading() -> UUID {
-        loadTask?.cancel()
-        loadTask = nil
+        loadTask.cancel()
         state.loadState = .loading
-        let generation = UUID()
-        loadGeneration = generation
-        return generation
+        return loadGeneration.begin()
     }
 
     private func load(generation: UUID) async {
@@ -101,11 +96,12 @@ final class PostDetailViewModel: ObservableObject {
         let storage = bookmarksStorage
         let postID = postID
         let revision = bookmarkRevision
+        let hadVisiblePost = state.post != nil
 
         let savedPost: PostModel?
         do {
             savedPost = try await storage.getBookmarks().first { $0.id == postID }
-            guard isCurrentLoad(generation) else { return }
+            guard loadGeneration.isCurrent(generation) else { return }
             if bookmarkRevision == revision && bookmarkTask == nil {
                 state.isBookmarked = savedPost != nil
             }
@@ -116,19 +112,22 @@ final class PostDetailViewModel: ObservableObject {
             // A damaged local file must not prevent a successful network load.
             savedPost = nil
         }
-        guard isCurrentLoad(generation) else { return }
+        guard loadGeneration.isCurrent(generation) else { return }
 
         do {
             let post = try await repository.fetchPost(id: postID)
-            guard isCurrentLoad(generation) else { return }
+            guard loadGeneration.isCurrent(generation) else { return }
             state.post = post
             state.loadState = .loaded
+            state.refreshError = nil
         } catch {
-            guard isCurrentLoad(generation) else { return }
-            if Self.isCancellation(error) {
+            guard loadGeneration.isCurrent(generation) else { return }
+            if NetworkError.isCancellation(error) {
                 state.loadState = state.post == nil ? .idle : .loaded
+            } else if hadVisiblePost {
+                state.loadState = .loaded
+                state.refreshError = AppError(error)
             } else if Self.hasBody(savedPost) {
-                // Keep an already-visible, newer version when refreshing.
                 if state.post == nil {
                     state.post = savedPost
                 }
@@ -139,14 +138,10 @@ final class PostDetailViewModel: ObservableObject {
         }
     }
 
-    private func isCurrentLoad(_ generation: UUID) -> Bool {
-        loadGeneration == generation && !Task.isCancelled
-    }
-
     private func finishLoading(generation: UUID) {
-        guard loadGeneration == generation else { return }
-        loadGeneration = nil
-        loadTask = nil
+        if loadGeneration.end(generation) {
+            loadTask.clear()
+        }
     }
 
     private func toggleBookmark() -> Task<Void, Never>? {
@@ -171,7 +166,7 @@ final class PostDetailViewModel: ObservableObject {
                 self.state.bookmarkUpdate = .loaded
             } catch {
                 guard !Task.isCancelled, let self else { return }
-                if Self.isCancellation(error) {
+                if NetworkError.isCancellation(error) {
                     self.state.bookmarkUpdate = .idle
                 } else {
                     self.state.bookmarkUpdate = .failed(AppError(error))
@@ -188,7 +183,7 @@ final class PostDetailViewModel: ObservableObject {
     }
 
     private func synchronizeBookmark() -> Task<Void, Never>? {
-        guard state.post != nil, bookmarkTask == nil, loadTask == nil else { return nil }
+        guard state.post != nil, bookmarkTask == nil, !loadTask.isRunning else { return nil }
         let storage = bookmarksStorage
         let postID = postID
         state.bookmarkUpdate = .loading
@@ -208,10 +203,5 @@ final class PostDetailViewModel: ObservableObject {
     private static func hasBody(_ post: PostModel?) -> Bool {
         guard let body = post?.bodyMarkdown else { return false }
         return !body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-    }
-
-    private static func isCancellation(_ error: any Error) -> Bool {
-        error is CancellationError || error as? NetworkError == .cancelled
-            || (error as? URLError)?.code == .cancelled
     }
 }

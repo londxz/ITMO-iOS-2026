@@ -7,6 +7,7 @@
 
 import CryptoKit
 import Foundation
+import ImageIO
 
 protocol ImageCache: Sendable {
     func data(for url: URL) async throws -> Data
@@ -14,10 +15,14 @@ protocol ImageCache: Sendable {
 }
 
 actor ImageCacheImpl: ImageCache {
+    typealias Loader = @Sendable (URL) async throws -> (Data, URLResponse)
+
     private static let defaultDiskLimitBytes = 150 * 1024 * 1024
     private static let defaultMemoryLimitBytes = 50 * 1024 * 1024
+    private static let trimTargetRatio = 0.8
 
     private struct InFlightRequest {
+        let id: UUID
         let task: Task<Data, any Error>
         var waiters: Set<UUID>
     }
@@ -28,22 +33,23 @@ actor ImageCacheImpl: ImageCache {
         let lastAccessedAt: Date
     }
 
-    private let session: URLSession
+    private let loader: Loader
     private let fileManager: FileManager
     private let directoryURL: URL
     private let diskLimitBytes: Int
     private let memoryCache = NSCache<NSURL, NSData>()
 
     private var inFlightRequests: [URL: InFlightRequest] = [:]
+    private var diskUsageBytes: Int?
 
     init(
-        session: URLSession = .shared,
+        loader: @escaping Loader = { try await URLSession.shared.data(from: $0) },
         fileManager: FileManager = .default,
         directoryURL: URL? = nil,
         diskLimitBytes: Int = ImageCacheImpl.defaultDiskLimitBytes,
         memoryLimitBytes: Int = ImageCacheImpl.defaultMemoryLimitBytes
     ) {
-        self.session = session
+        self.loader = loader
         self.fileManager = fileManager
         self.diskLimitBytes = diskLimitBytes
 
@@ -74,105 +80,126 @@ actor ImageCacheImpl: ImageCache {
         }
 
         let waiterID = UUID()
-        let requestTask = joinOrCreateRequest(for: url, waiterID: waiterID)
+        let request = joinOrCreateRequest(for: url, waiterID: waiterID)
 
         do {
             let data = try await withTaskCancellationHandler {
-                let data = try await requestTask.value
-                try Task.checkCancellation()
-                return data
+                try await request.task.value
             } onCancel: {
                 Task {
-                    await self.cancelWaiter(waiterID, for: url)
+                    await self.releaseWaiter(waiterID, of: request.id, for: url)
                 }
             }
-
-            guard inFlightRequests.removeValue(forKey: url) != nil else {
-                return data
-            }
-
-            storeInMemory(data, for: url)
-            storeOnDisk(data, for: url)
-            trimDiskCacheIfNeeded()
+            try Task.checkCancellation()
             return data
         } catch {
-            releaseWaiter(waiterID, for: url)
-
-            if error is CancellationError {
-                throw NetworkError.cancelled
-            }
-            if let urlError = error as? URLError {
-                if urlError.code == .cancelled {
-                    throw NetworkError.cancelled
-                }
-                throw NetworkError.transport(urlError.code)
-            }
-            throw error
+            releaseWaiter(waiterID, of: request.id, for: url)
+            throw NetworkError(error)
         }
     }
 
     func clearCache() throws {
-        inFlightRequests.values.forEach { $0.task.cancel() }
+        let activeRequests = inFlightRequests.values
         inFlightRequests.removeAll()
+        activeRequests.forEach { $0.task.cancel() }
         memoryCache.removeAllObjects()
 
+        diskUsageBytes = nil
         if fileManager.fileExists(atPath: directoryURL.path) {
             try fileManager.removeItem(at: directoryURL)
         }
         try createCacheDirectoryIfNeeded()
+        diskUsageBytes = 0
     }
 
-    private func joinOrCreateRequest(
-        for url: URL,
-        waiterID: UUID
-    ) -> Task<Data, any Error> {
+    func waitingConsumerCount(for url: URL) -> Int {
+        inFlightRequests[url]?.waiters.count ?? 0
+    }
+
+    static func cacheFileName(for url: URL) -> String {
+        let digest = SHA256.hash(data: Data(url.absoluteString.utf8))
+        return digest.map { String(format: "%02x", $0) }.joined()
+    }
+
+    static func isDecodableImage(_ data: Data) -> Bool {
+        guard !data.isEmpty,
+              let source = CGImageSourceCreateWithData(data as CFData, nil),
+              CGImageSourceGetCount(source) > 0
+        else { return false }
+        return CGImageSourceCreateImageAtIndex(source, 0, nil) != nil
+    }
+
+    private func joinOrCreateRequest(for url: URL, waiterID: UUID) -> InFlightRequest {
         if var request = inFlightRequests[url] {
             request.waiters.insert(waiterID)
             inFlightRequests[url] = request
-            return request.task
+            return request
         }
 
-        let session = session
+        let requestID = UUID()
+        let loader = loader
         let task = Task<Data, any Error> {
-            try Task.checkCancellation()
-            let (data, response) = try await session.data(from: url)
-            try Task.checkCancellation()
-
-            guard let httpResponse = response as? HTTPURLResponse else {
-                throw NetworkError.invalidResponse
+            let result: Result<Data, any Error>
+            do {
+                result = .success(try await Self.download(url, using: loader))
+            } catch {
+                result = .failure(error)
             }
-            guard (200...299).contains(httpResponse.statusCode) else {
-                throw NetworkError.serverUnavailable(
-                    statusCode: httpResponse.statusCode
-                )
-            }
-            guard !data.isEmpty else {
-                throw NetworkError.invalidResponse
-            }
-            return data
+            return try self.finishRequest(requestID, for: url, with: result)
         }
 
-        inFlightRequests[url] = InFlightRequest(
-            task: task,
-            waiters: [waiterID]
-        )
-        return task
+        let request = InFlightRequest(id: requestID, task: task, waiters: [waiterID])
+        inFlightRequests[url] = request
+        return request
     }
 
-    private func cancelWaiter(_ waiterID: UUID, for url: URL) {
-        releaseWaiter(waiterID, for: url)
+    private func finishRequest(
+        _ requestID: UUID,
+        for url: URL,
+        with result: Result<Data, any Error>
+    ) throws -> Data {
+        let isActive = inFlightRequests[url]?.id == requestID
+        if isActive {
+            inFlightRequests[url] = nil
+        }
+
+        let data = try result.get()
+        if isActive {
+            storeInMemory(data, for: url)
+            storeOnDisk(data, for: url)
+        }
+        return data
     }
 
-    private func releaseWaiter(_ waiterID: UUID, for url: URL) {
-        guard var request = inFlightRequests[url] else { return }
-        request.waiters.remove(waiterID)
+    private func releaseWaiter(_ waiterID: UUID, of requestID: UUID, for url: URL) {
+        guard var request = inFlightRequests[url],
+              request.id == requestID,
+              request.waiters.remove(waiterID) != nil
+        else { return }
 
         if request.waiters.isEmpty {
-            request.task.cancel()
             inFlightRequests[url] = nil
+            request.task.cancel()
         } else {
             inFlightRequests[url] = request
         }
+    }
+
+    @concurrent
+    private static func download(_ url: URL, using loader: Loader) async throws -> Data {
+        let (data, response) = try await loader(url)
+        try Task.checkCancellation()
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NetworkError.invalidResponse
+        }
+        if let statusError = NetworkError(statusCode: httpResponse.statusCode) {
+            throw statusError
+        }
+        guard isDecodableImage(data) else {
+            throw NetworkError.invalidResponse
+        }
+        return data
     }
 
     private func storeInMemory(_ data: Data, for url: URL) {
@@ -182,35 +209,53 @@ actor ImageCacheImpl: ImageCache {
             cost: data.count
         )
     }
+}
 
+extension ImageCacheImpl {
     private func loadFromDisk(for url: URL) -> Data? {
         let fileURL = cachedFileURL(for: url)
         guard fileManager.fileExists(atPath: fileURL.path) else { return nil }
 
-        do {
-            let data = try Data(contentsOf: fileURL, options: .mappedIfSafe)
-            guard !data.isEmpty else {
-                try? fileManager.removeItem(at: fileURL)
-                return nil
-            }
-
-            try? fileManager.setAttributes(
-                [.modificationDate: Date()],
-                ofItemAtPath: fileURL.path
-            )
-            return data
-        } catch {
-            try? fileManager.removeItem(at: fileURL)
+        guard let data = try? Data(contentsOf: fileURL, options: .mappedIfSafe),
+              Self.isDecodableImage(data)
+        else {
+            removeDiskFile(at: fileURL)
             return nil
         }
+
+        try? fileManager.setAttributes(
+            [.modificationDate: Date()],
+            ofItemAtPath: fileURL.path
+        )
+        return data
     }
 
     private func storeOnDisk(_ data: Data, for url: URL) {
+        let fileURL = cachedFileURL(for: url)
+        let previousSize = fileSize(at: fileURL)
         do {
             try createCacheDirectoryIfNeeded()
-            try data.write(to: cachedFileURL(for: url), options: .atomic)
+            try data.write(to: fileURL, options: .atomic)
         } catch {
-            // Disk caching is best-effort. The downloaded image remains in memory.
+            return
+        }
+
+        if let usage = diskUsageBytes {
+            diskUsageBytes = usage - previousSize + data.count
+        } else {
+            diskUsageBytes = diskEntries().reduce(0) { $0 + $1.size }
+        }
+
+        if let usage = diskUsageBytes, usage > diskLimitBytes {
+            trimDiskCache()
+        }
+    }
+
+    private func removeDiskFile(at fileURL: URL) {
+        let size = fileSize(at: fileURL)
+        guard (try? fileManager.removeItem(at: fileURL)) != nil else { return }
+        if let usage = diskUsageBytes {
+            diskUsageBytes = max(0, usage - size)
         }
     }
 
@@ -222,12 +267,15 @@ actor ImageCacheImpl: ImageCache {
     }
 
     private func cachedFileURL(for url: URL) -> URL {
-        let digest = SHA256.hash(data: Data(url.absoluteString.utf8))
-        let fileName = digest.map { String(format: "%02x", $0) }.joined()
-        return directoryURL.appendingPathComponent(fileName, isDirectory: false)
+        directoryURL.appendingPathComponent(Self.cacheFileName(for: url), isDirectory: false)
     }
 
-    private func trimDiskCacheIfNeeded() {
+    private func fileSize(at fileURL: URL) -> Int {
+        let attributes = try? fileManager.attributesOfItem(atPath: fileURL.path)
+        return (attributes?[.size] as? NSNumber)?.intValue ?? 0
+    }
+
+    private func diskEntries() -> [DiskEntry] {
         let keys: Set<URLResourceKey> = [
             .isRegularFileKey,
             .fileSizeKey,
@@ -238,31 +286,33 @@ actor ImageCacheImpl: ImageCache {
             at: directoryURL,
             includingPropertiesForKeys: Array(keys),
             options: [.skipsHiddenFiles]
-        ) else { return }
+        ) else { return [] }
 
-        let entries = urls.compactMap { url -> DiskEntry? in
+        return urls.compactMap { url -> DiskEntry? in
             guard let values = try? url.resourceValues(forKeys: keys),
-                  values.isRegularFile == true
+                  values.isRegularFile == true,
+                  let size = values.fileSize
             else { return nil }
 
             return DiskEntry(
                 url: url,
-                size: values.fileSize ?? 0,
+                size: size,
                 lastAccessedAt: values.contentModificationDate ?? .distantPast
             )
         }
+    }
 
+    private func trimDiskCache() {
+        let entries = diskEntries()
+        let targetBytes = Int(Double(diskLimitBytes) * Self.trimTargetRatio)
         var totalSize = entries.reduce(0) { $0 + $1.size }
-        guard totalSize > diskLimitBytes else { return }
 
         for entry in entries.sorted(by: { $0.lastAccessedAt < $1.lastAccessedAt }) {
-            guard totalSize > diskLimitBytes else { break }
-            do {
-                try fileManager.removeItem(at: entry.url)
+            guard totalSize > targetBytes else { break }
+            if (try? fileManager.removeItem(at: entry.url)) != nil {
                 totalSize -= entry.size
-            } catch {
-                continue
             }
         }
+        diskUsageBytes = totalSize
     }
 }
