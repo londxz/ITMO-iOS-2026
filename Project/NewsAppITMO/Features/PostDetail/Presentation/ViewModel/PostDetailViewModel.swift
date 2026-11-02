@@ -36,30 +36,16 @@ final class PostDetailViewModel: ObservableObject {
     func send(_ action: PostDetailAction) -> Task<Void, Never>? {
         switch action {
         case .onAppear:
-            if state.loadState == .idle { return startLoading() }
-            return synchronizeBookmark()
+            return handleOnAppear()
         case .retry, .refresh:
             return startLoading()
         case .toggleBookmark:
             return toggleBookmark()
         case .onDisappear:
-            loadTask.cancel()
-            loadGeneration.invalidate()
-            if state.loadState == .loading {
-                state.loadState = state.post == nil ? .idle : .loaded
-            }
-            // Once an atomic file write starts, let it finish. Cancelling then
-            // could leave the visible bookmark state behind the persisted file.
-            if !bookmarkWriteStarted {
-                bookmarkTask?.cancel()
-                bookmarkTask = nil
-                state.bookmarkUpdate = .idle
-            }
+            handleOnDisappear()
             return nil
         case .didSelectAuthor:
-            if let author = state.post?.author {
-                router?.openAuthor(id: author.id, username: author.username)
-            }
+            openAuthor()
             return nil
         case .didSelectComments:
             router?.openComments(postID: postID)
@@ -71,6 +57,29 @@ final class PostDetailViewModel: ObservableObject {
             state.refreshError = nil
             return nil
         }
+    }
+
+    private func handleOnAppear() -> Task<Void, Never>? {
+        state.loadState == .idle ? startLoading() : synchronizeBookmark()
+    }
+
+    private func handleOnDisappear() {
+        loadTask.cancel()
+        loadGeneration.invalidate()
+        if state.loadState == .loading {
+            state.loadState = state.post == nil ? .idle : .loaded
+        }
+        // Once an atomic file write starts, let it finish. Cancelling then
+        // could leave the visible bookmark state behind the persisted file.
+        guard !bookmarkWriteStarted else { return }
+        bookmarkTask?.cancel()
+        bookmarkTask = nil
+        state.bookmarkUpdate = .idle
+    }
+
+    private func openAuthor() {
+        guard let author = state.post?.author else { return }
+        router?.openAuthor(id: author.id, username: author.username)
     }
 
     func refresh() async {
@@ -98,20 +107,12 @@ final class PostDetailViewModel: ObservableObject {
         let revision = bookmarkRevision
         let hadVisiblePost = state.post != nil
 
-        let savedPost: PostModel?
-        do {
-            savedPost = try await storage.getBookmarks().first { $0.id == postID }
-            guard loadGeneration.isCurrent(generation) else { return }
-            if bookmarkRevision == revision && bookmarkTask == nil {
-                state.isBookmarked = savedPost != nil
-            }
-            if state.post == nil, Self.hasBody(savedPost) {
-                state.post = savedPost
-            }
-        } catch {
-            // A damaged local file must not prevent a successful network load.
-            savedPost = nil
-        }
+        let savedPost = await loadSavedPost(
+            from: storage,
+            postID: postID,
+            revision: revision,
+            generation: generation
+        )
         guard loadGeneration.isCurrent(generation) else { return }
 
         do {
@@ -122,19 +123,47 @@ final class PostDetailViewModel: ObservableObject {
             state.refreshError = nil
         } catch {
             guard loadGeneration.isCurrent(generation) else { return }
-            if NetworkError.isCancellation(error) {
-                state.loadState = state.post == nil ? .idle : .loaded
-            } else if hadVisiblePost {
-                state.loadState = .loaded
-                state.refreshError = AppError(error)
-            } else if Self.hasBody(savedPost) {
-                if state.post == nil {
-                    state.post = savedPost
-                }
-                state.loadState = .loaded
-            } else {
-                state.loadState = .failed(AppError(error))
+            handleLoadFailure(error, savedPost: savedPost, hadVisiblePost: hadVisiblePost)
+        }
+    }
+
+    private func loadSavedPost(
+        from storage: any BookmarksStorage,
+        postID: String,
+        revision: Int,
+        generation: UUID
+    ) async -> PostModel? {
+        do {
+            let savedPost = try await storage.getBookmarks().first { $0.id == postID }
+            guard loadGeneration.isCurrent(generation) else { return nil }
+            if bookmarkRevision == revision && bookmarkTask == nil {
+                state.isBookmarked = savedPost != nil
             }
+            if state.post == nil, Self.hasBody(savedPost) {
+                state.post = savedPost
+            }
+            return savedPost
+        } catch {
+            // A damaged local file must not prevent a successful network load.
+            return nil
+        }
+    }
+
+    private func handleLoadFailure(
+        _ error: any Error,
+        savedPost: PostModel?,
+        hadVisiblePost: Bool
+    ) {
+        if NetworkError.isCancellation(error) {
+            state.loadState = state.post == nil ? .idle : .loaded
+        } else if hadVisiblePost {
+            state.loadState = .loaded
+            state.refreshError = AppError(error)
+        } else if Self.hasBody(savedPost) {
+            state.post = state.post ?? savedPost
+            state.loadState = .loaded
+        } else {
+            state.loadState = .failed(AppError(error))
         }
     }
 

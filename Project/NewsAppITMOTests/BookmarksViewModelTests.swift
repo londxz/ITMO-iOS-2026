@@ -27,42 +27,42 @@ final class BookmarksViewModelTests: XCTestCase {
         let file = temporaryFile()
         defer { try? FileManager.default.removeItem(at: file) }
         let storage = FileBookmarksStorage(fileURL: file)
-        let vm = BookmarksViewModel(storage: storage, router: nil)
-        defer { vm.send(.onDisappear) }
-        let observation = vm.send(.onAppear)!
-        XCTAssertEqual(vm.state.loadState, .loading)
-        XCTAssertNil(vm.send(.onAppear))
-        await waitUntil { vm.state.loadState == .loaded }
-        XCTAssertTrue(vm.state.isEmpty)
+        let viewModel = BookmarksViewModel(storage: storage, router: nil)
+        defer { viewModel.send(.onDisappear) }
+        let observation = viewModel.send(.onAppear)!
+        XCTAssertEqual(viewModel.state.loadState, .loading)
+        XCTAssertNil(viewModel.send(.onAppear))
+        await waitUntil { viewModel.state.loadState == .loaded }
+        XCTAssertTrue(viewModel.state.isEmpty)
         try await storage.save(post: post("1"))
-        await waitUntil { vm.state.bookmarks.count == 1 }
-        vm.send(.searchTextChanged("missing"))
-        XCTAssertTrue(vm.state.hasNoSearchResults)
-        vm.send(.onDisappear)
+        await waitUntil { viewModel.state.bookmarks.count == 1 }
+        viewModel.send(.searchTextChanged("missing"))
+        XCTAssertTrue(viewModel.state.hasNoSearchResults)
+        viewModel.send(.onDisappear)
         XCTAssertTrue(observation.isCancelled)
         await observation.value
 
         try await storage.save(post: post("2"))
-        XCTAssertEqual(vm.state.bookmarks.count, 1)
-        XCTAssertNotNil(vm.send(.onAppear))
-        await waitUntil { vm.state.bookmarks.count == 2 }
-        XCTAssertEqual(vm.state.searchText, "missing")
-        XCTAssertEqual(vm.state.loadState, .loaded)
+        XCTAssertEqual(viewModel.state.bookmarks.count, 1)
+        XCTAssertNotNil(viewModel.send(.onAppear))
+        await waitUntil { viewModel.state.bookmarks.count == 2 }
+        XCTAssertEqual(viewModel.state.searchText, "missing")
+        XCTAssertEqual(viewModel.state.loadState, .loaded)
     }
 
     func testCorruptFileShowsErrorAndRetryRecovers() async throws {
         let file = temporaryFile()
         defer { try? FileManager.default.removeItem(at: file) }
         try Data("broken json".utf8).write(to: file)
-        let vm = BookmarksViewModel(storage: FileBookmarksStorage(fileURL: file), router: nil)
-        defer { vm.send(.onDisappear) }
-        await vm.send(.onAppear)?.value
-        guard case .failed = vm.state.loadState else { return XCTFail("Expected file read error") }
-        XCTAssertTrue(vm.state.isEmpty)
+        let viewModel = BookmarksViewModel(storage: FileBookmarksStorage(fileURL: file), router: nil)
+        defer { viewModel.send(.onDisappear) }
+        await viewModel.send(.onAppear)?.value
+        guard case .failed = viewModel.state.loadState else { return XCTFail("Expected file read error") }
+        XCTAssertTrue(viewModel.state.isEmpty)
         try JSONEncoder().encode([post("1")]).write(to: file)
-        vm.send(.retry)
-        await waitUntil { vm.state.loadState == .loaded }
-        XCTAssertEqual(vm.state.bookmarks.map(\.id), ["1"])
+        viewModel.send(.retry)
+        await waitUntil { viewModel.state.loadState == .loaded }
+        XCTAssertEqual(viewModel.state.bookmarks.map(\.id), ["1"])
     }
 
     func testDeletionWaitsForPersistenceAndFailureKeepsArticle() async throws {
@@ -70,28 +70,28 @@ final class BookmarksViewModelTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: file) }
         let storage = ControlledRemovalStorage(fileURL: file)
         try await storage.save(post: post("1"))
-        let vm = BookmarksViewModel(storage: storage, router: nil)
-        defer { vm.send(.onDisappear) }
-        vm.send(.onAppear)
-        await waitUntil { vm.state.bookmarks.count == 1 }
-        let failedDelete = vm.send(.delete(id: "1"))!
+        let viewModel = BookmarksViewModel(storage: storage, router: nil)
+        defer { viewModel.send(.onDisappear) }
+        viewModel.send(.onAppear)
+        await waitUntil { viewModel.state.bookmarks.count == 1 }
+        let failedDelete = viewModel.send(.delete(id: "1"))!
         await waitUntil { await storage.isRemoving }
-        XCTAssertEqual(vm.state.bookmarks.count, 1)
-        XCTAssertEqual(vm.state.deletingID, "1")
-        XCTAssertNil(vm.send(.delete(id: "1")))
+        XCTAssertEqual(viewModel.state.bookmarks.count, 1)
+        XCTAssertEqual(viewModel.state.deletingID, "1")
+        XCTAssertNil(viewModel.send(.delete(id: "1")))
         await storage.finishRemoval(error: CocoaError(.fileWriteNoPermission))
         await failedDelete.value
-        XCTAssertEqual(vm.state.bookmarks.map(\.id), ["1"])
-        XCTAssertNotNil(vm.state.message)
-        XCTAssertNil(vm.state.deletingID)
-        vm.send(.dismissMessage)
-        XCTAssertNil(vm.state.message)
+        XCTAssertEqual(viewModel.state.bookmarks.map(\.id), ["1"])
+        XCTAssertNotNil(viewModel.state.message)
+        XCTAssertNil(viewModel.state.deletingID)
+        viewModel.send(.dismissMessage)
+        XCTAssertNil(viewModel.state.message)
 
-        let successfulDelete = vm.send(.delete(id: "1"))!
+        let successfulDelete = viewModel.send(.delete(id: "1"))!
         await waitUntil { await storage.isRemoving }
         await storage.finishRemoval()
         await successfulDelete.value
-        await waitUntil { vm.state.isEmpty }
+        await waitUntil { viewModel.state.isEmpty }
         let persisted = try await FileBookmarksStorage(fileURL: file).getBookmarks()
         XCTAssertTrue(persisted.isEmpty)
     }
@@ -101,27 +101,27 @@ final class BookmarksViewModelTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: file) }
         let storage = ControlledRemovalStorage(fileURL: file)
         try await storage.save(post: post("1"))
-        let vm = BookmarksViewModel(storage: storage, router: nil)
-        defer { vm.send(.onDisappear) }
-        vm.send(.onAppear)
-        await waitUntil { vm.state.bookmarks.count == 1 }
-        let deletion = vm.send(.delete(id: "1"))!
+        let viewModel = BookmarksViewModel(storage: storage, router: nil)
+        defer { viewModel.send(.onDisappear) }
+        viewModel.send(.onAppear)
+        await waitUntil { viewModel.state.bookmarks.count == 1 }
+        let deletion = viewModel.send(.delete(id: "1"))!
         await waitUntil { await storage.isRemoving }
-        vm.send(.onDisappear)
+        viewModel.send(.onDisappear)
         XCTAssertTrue(deletion.isCancelled)
-        XCTAssertNil(vm.state.deletingID)
+        XCTAssertNil(viewModel.state.deletingID)
         // An atomic disk write already in progress may finish after cancellation.
         await storage.finishRemoval()
         await deletion.value
-        XCTAssertNil(vm.state.message)
-        vm.send(.onAppear)
-        await waitUntil { vm.state.isEmpty && vm.state.loadState == .loaded }
+        XCTAssertNil(viewModel.state.message)
+        viewModel.send(.onAppear)
+        await waitUntil { viewModel.state.isEmpty && viewModel.state.loadState == .loaded }
     }
 
     func testSelectionRoutesThroughInjectedRouter() {
         let router = BookmarksTestRouter()
-        let vm = BookmarksViewModel(storage: FileBookmarksStorage(fileURL: temporaryFile()), router: router)
-        vm.send(.didSelectPost(id: "saved-post"))
+        let viewModel = BookmarksViewModel(storage: FileBookmarksStorage(fileURL: temporaryFile()), router: router)
+        viewModel.send(.didSelectPost(id: "saved-post"))
         XCTAssertEqual(router.selectedID, "saved-post")
     }
 
