@@ -25,8 +25,7 @@ final class BlogViewModel: ObservableObject {
     func send(_ action: BlogAction) -> Task<Void, Never>? {
         switch action {
         case .onAppear:
-            guard state.initialLoad == .idle else { return nil }
-            return startFirstPageLoad(reloadTags: true)
+            return handleOnAppear()
         case .refresh:
             return startFirstPageLoad(reloadTags: true)
         case .loadMore:
@@ -35,13 +34,9 @@ final class BlogViewModel: ObservableObject {
             state.refreshError = nil
             return nil
         case .selectTag(let tag):
-            guard tag != state.selectedTag else { return nil }
-            state.selectedTag = tag
-            return restartFeed()
+            return selectTag(tag)
         case .selectSort(let sort):
-            guard sort != state.selectedSort else { return nil }
-            state.selectedSort = sort
-            return restartFeed()
+            return selectSort(sort)
         case .onDisappear:
             cancelLoading()
             return nil
@@ -52,6 +47,23 @@ final class BlogViewModel: ObservableObject {
             router?.openAuthor(id: id, username: username)
             return nil
         }
+    }
+
+    private func handleOnAppear() -> Task<Void, Never>? {
+        guard state.initialLoad == .idle else { return nil }
+        return startFirstPageLoad(reloadTags: true)
+    }
+
+    private func selectTag(_ tag: BlogTagModel?) -> Task<Void, Never>? {
+        guard tag != state.selectedTag else { return nil }
+        state.selectedTag = tag
+        return restartFeed()
+    }
+
+    private func selectSort(_ sort: BlogSort) -> Task<Void, Never>? {
+        guard sort != state.selectedSort else { return nil }
+        state.selectedSort = sort
+        return restartFeed()
     }
 
     func refresh() async {
@@ -93,46 +105,62 @@ final class BlogViewModel: ObservableObject {
         let pageSize = Self.pageSize
 
         async let firstPage = repository.fetchArticles(tag: tag, sort: sort, page: 1, perPage: pageSize)
-        var tags: [BlogTagModel]?
-        if reloadTags {
-            do {
-                tags = try await repository.fetchTags()
-            } catch where !Task.isCancelled {
-                logger.error("tags load failed: \(String(describing: error), privacy: .public)")
-            } catch {}
-        }
+        let tags = await loadTags(when: reloadTags)
 
         do {
             let posts = try await firstPage
             guard firstPageGeneration.isCurrent(generation) else { return }
-
-            var newState = state
-            if let tags {
-                newState.tags = Self.tags(tags, keeping: newState.selectedTag)
-            }
-            newState.posts = posts
-            newState.currentPage = 1
-            newState.canLoadMore = posts.count == pageSize
-            newState.initialLoad = .loaded
-            newState.refreshError = nil
-            state = newState
+            applyFirstPage(posts, tags: tags, pageSize: pageSize)
         } catch {
             guard firstPageGeneration.isCurrent(generation) else { return }
-            guard !NetworkError.isCancellation(error) else {
-                if state.initialLoad == .loading {
-                    state.initialLoad = .idle
-                }
-                return
+            handleFirstPageFailure(error, tags: tags)
+        }
+    }
+
+    private func loadTags(when shouldReload: Bool) async -> [BlogTagModel]? {
+        guard shouldReload else { return nil }
+        do {
+            return try await repository.fetchTags()
+        } catch {
+            if !NetworkError.isCancellation(error) {
+                logger.error("tags load failed: \(String(describing: error), privacy: .public)")
             }
-            logger.error("first page load failed: \(String(describing: error), privacy: .public)")
-            if let tags {
-                state.tags = Self.tags(tags, keeping: state.selectedTag)
+            return nil
+        }
+    }
+
+    private func applyFirstPage(
+        _ posts: [PostModel],
+        tags: [BlogTagModel]?,
+        pageSize: Int
+    ) {
+        var newState = state
+        if let tags {
+            newState.tags = Self.tags(tags, keeping: newState.selectedTag)
+        }
+        newState.posts = posts
+        newState.currentPage = 1
+        newState.canLoadMore = posts.count == pageSize
+        newState.initialLoad = .loaded
+        newState.refreshError = nil
+        state = newState
+    }
+
+    private func handleFirstPageFailure(_ error: any Error, tags: [BlogTagModel]?) {
+        if NetworkError.isCancellation(error) {
+            if state.initialLoad == .loading {
+                state.initialLoad = .idle
             }
-            if state.isEmpty {
-                state.initialLoad = .failed(AppError(error))
-            } else {
-                state.refreshError = AppError(error)
-            }
+            return
+        }
+        logger.error("first page load failed: \(String(describing: error), privacy: .public)")
+        if let tags {
+            state.tags = Self.tags(tags, keeping: state.selectedTag)
+        }
+        if state.isEmpty {
+            state.initialLoad = .failed(AppError(error))
+        } else {
+            state.refreshError = AppError(error)
         }
     }
 

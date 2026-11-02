@@ -47,7 +47,11 @@ struct BookmarksView: View {
                 )
             }
         } else if viewModel.state.hasNoSearchResults {
-            EmptyStateView(title: "Ничего не найдено", message: "Попробуйте другой запрос", systemImage: "magnifyingglass")
+            EmptyStateView(
+                title: "Ничего не найдено",
+                message: "Попробуйте другой запрос",
+                systemImage: "magnifyingglass"
+            )
         } else {
             bookmarksList
         }

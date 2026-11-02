@@ -1,6 +1,8 @@
 import XCTest
 @testable import NewsAppITMO
 
+// The complete state-machine regression suite is kept in one file for shared fixtures.
+// swiftlint:disable file_length type_body_length
 @MainActor
 final class NewsViewModelTests: XCTestCase {
     func testFirstLoadPublishesHeroAndFreshPosts() async throws {
@@ -503,3 +505,4 @@ final class NewsViewModelTests: XCTestCase {
         try await repository.succeed(freshRequest, posts: posts)
     }
 }
+// swiftlint:enable file_length type_body_length

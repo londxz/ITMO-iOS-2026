@@ -10,15 +10,15 @@ final class PostDetailViewModelTests: XCTestCase {
         let post = makePost()
         try await storage.save(post: post)
         let repository = DetailTestRepository(result: .failure(.transport(.notConnectedToInternet)))
-        let vm = makeViewModel(repository, storage)
+        let viewModel = makeViewModel(repository, storage)
 
-        await vm.send(.onAppear)?.value
+        await viewModel.send(.onAppear)?.value
 
-        XCTAssertEqual(vm.state.post, post)
-        XCTAssertEqual(vm.state.post?.bodyMarkdown, "# Heading\n\n```swift\nlet value = 1\n```")
-        XCTAssertEqual(vm.state.loadState, .loaded)
-        XCTAssertTrue(vm.state.isBookmarked)
-        XCTAssertNil(vm.state.refreshError)
+        XCTAssertEqual(viewModel.state.post, post)
+        XCTAssertEqual(viewModel.state.post?.bodyMarkdown, "# Heading\n\n```swift\nlet value = 1\n```")
+        XCTAssertEqual(viewModel.state.loadState, .loaded)
+        XCTAssertTrue(viewModel.state.isBookmarked)
+        XCTAssertNil(viewModel.state.refreshError)
     }
 
     func testRefreshOfSavedArticleReportsFailureButKeepsArticle() async {
@@ -37,83 +37,86 @@ final class PostDetailViewModelTests: XCTestCase {
 
     func testIncompleteSavedArticleDoesNotHideNetworkError() async {
         let storage = DetailTestBookmarks(posts: [makePost(body: nil)])
-        let vm = makeViewModel(DetailTestRepository(result: .failure(.transport(.notConnectedToInternet))), storage)
-        await vm.send(.onAppear)?.value
-        XCTAssertEqual(vm.state.loadState, .failed(.networkUnavailable))
-        XCTAssertNil(vm.state.post)
+        let repository = DetailTestRepository(
+            result: .failure(.transport(.notConnectedToInternet))
+        )
+        let viewModel = makeViewModel(repository, storage)
+        await viewModel.send(.onAppear)?.value
+        XCTAssertEqual(viewModel.state.loadState, .failed(.networkUnavailable))
+        XCTAssertNil(viewModel.state.post)
     }
 
     func testLocalReadErrorDoesNotHideNetworkSuccess() async {
         let storage = DetailTestBookmarks()
         await storage.failReads()
-        let vm = makeViewModel(DetailTestRepository(result: .success(makePost())), storage)
-        await vm.send(.onAppear)?.value
-        XCTAssertEqual(vm.state.post, makePost())
-        XCTAssertEqual(vm.state.loadState, .loaded)
+        let viewModel = makeViewModel(DetailTestRepository(result: .success(makePost())), storage)
+        await viewModel.send(.onAppear)?.value
+        XCTAssertEqual(viewModel.state.post, makePost())
+        XCTAssertEqual(viewModel.state.loadState, .loaded)
     }
 
     func testRefreshPreservesContentAndIgnoresSupersededResponse() async {
         let repository = DetailTestRepository(result: .success(makePost()))
-        let vm = makeViewModel(repository, DetailTestBookmarks())
-        await vm.send(.onAppear)?.value
+        let viewModel = makeViewModel(repository, DetailTestBookmarks())
+        await viewModel.send(.onAppear)?.value
         await repository.holdRequests()
-        let old = vm.send(.refresh)!
+        let old = viewModel.send(.refresh)!
         await waitUntil { await repository.count == 2 }
-        XCTAssertEqual(vm.state.post, makePost())
-        let new = vm.send(.retry)!
+        XCTAssertEqual(viewModel.state.post, makePost())
+        let new = viewModel.send(.retry)!
         await waitUntil { await repository.count == 3 }
         await repository.finish(3, .success(makePost(title: "New")))
         await new.value
         await repository.finish(2, .success(makePost(title: "Stale")))
         await old.value
-        XCTAssertEqual(vm.state.post?.title, "New")
-        XCTAssertEqual(vm.state.loadState, .loaded)
+        XCTAssertEqual(viewModel.state.post?.title, "New")
+        XCTAssertEqual(viewModel.state.loadState, .loaded)
     }
 
     func testFailedRefreshKeepsContentAndRetryRecovers() async {
         let repository = DetailTestRepository(result: .success(makePost()))
-        let vm = makeViewModel(repository, DetailTestBookmarks())
-        await vm.send(.onAppear)?.value
+        let viewModel = makeViewModel(repository, DetailTestBookmarks())
+        await viewModel.send(.onAppear)?.value
         await repository.setResult(.failure(.serverError(statusCode: 503)))
-        await vm.send(.refresh)?.value
-        XCTAssertEqual(vm.state.post, makePost())
-        XCTAssertEqual(vm.state.loadState, .loaded)
-        XCTAssertEqual(vm.state.refreshError, .serverUnavailable)
+        await viewModel.send(.refresh)?.value
+        XCTAssertEqual(viewModel.state.post, makePost())
+        XCTAssertEqual(viewModel.state.loadState, .loaded)
+        XCTAssertEqual(viewModel.state.refreshError, .serverUnavailable)
         await repository.setResult(.success(makePost(title: "Recovered")))
-        await vm.send(.retry)?.value
-        XCTAssertEqual(vm.state.post?.title, "Recovered")
-        XCTAssertEqual(vm.state.loadState, .loaded)
-        XCTAssertNil(vm.state.refreshError)
+        await viewModel.send(.retry)?.value
+        XCTAssertEqual(viewModel.state.post?.title, "Recovered")
+        XCTAssertEqual(viewModel.state.loadState, .loaded)
+        XCTAssertNil(viewModel.state.refreshError)
     }
 
     func testBookmarkWritesAreNotOptimisticAndFinishAfterLeaving() async {
         let storage = DetailTestBookmarks()
-        let vm = makeViewModel(DetailTestRepository(result: .success(makePost())), storage)
-        await vm.send(.onAppear)?.value
+        let viewModel = makeViewModel(DetailTestRepository(result: .success(makePost())), storage)
+        await viewModel.send(.onAppear)?.value
         await storage.holdWrites()
-        let saving = vm.send(.toggleBookmark)!
+        let saving = viewModel.send(.toggleBookmark)!
         await waitUntil { await storage.writeStarted }
-        XCTAssertFalse(vm.state.isBookmarked)
-        XCTAssertEqual(vm.state.bookmarkUpdate, .loading)
-        XCTAssertNil(vm.send(.toggleBookmark))
-        vm.send(.onDisappear)
+        XCTAssertFalse(viewModel.state.isBookmarked)
+        XCTAssertEqual(viewModel.state.bookmarkUpdate, .loading)
+        XCTAssertNil(viewModel.send(.toggleBookmark))
+        viewModel.send(.onDisappear)
         XCTAssertFalse(saving.isCancelled)
         await storage.finishWrite()
         await saving.value
-        XCTAssertTrue(vm.state.isBookmarked)
+        XCTAssertTrue(viewModel.state.isBookmarked)
         let saved = try? await storage.getBookmarks()
         XCTAssertEqual(saved, [makePost()])
 
         await storage.failWrites()
-        await vm.send(.toggleBookmark)?.value
-        XCTAssertTrue(vm.state.isBookmarked)
-        XCTAssertNotNil(vm.state.message)
-        vm.send(.dismissMessage)
-        XCTAssertNil(vm.state.message)
+        await viewModel.send(.toggleBookmark)?.value
+        XCTAssertTrue(viewModel.state.isBookmarked)
+        XCTAssertNotNil(viewModel.state.message)
+        viewModel.send(.dismissMessage)
+        XCTAssertNil(viewModel.state.message)
 
         await storage.allowWrites()
-        await vm.send(.toggleBookmark)?.value
-        XCTAssertFalse(vm.state.isBookmarked)
+        await viewModel.send(.toggleBookmark)?.value
+        XCTAssertFalse(viewModel.state.isBookmarked)
         let remaining = try? await storage.getBookmarks()
         XCTAssertEqual(remaining, [])
     }
@@ -121,25 +124,29 @@ final class PostDetailViewModelTests: XCTestCase {
     func testDisappearCancelsLoadAndLateResponseCannotUpdateState() async {
         let repository = DetailTestRepository(result: .success(makePost()))
         await repository.holdRequests()
-        let vm = makeViewModel(repository, DetailTestBookmarks())
-        let task = vm.send(.onAppear)!
+        let viewModel = makeViewModel(repository, DetailTestBookmarks())
+        let task = viewModel.send(.onAppear)!
         await waitUntil { await repository.count == 1 }
-        XCTAssertNil(vm.send(.onAppear))
-        vm.send(.onDisappear)
+        XCTAssertNil(viewModel.send(.onAppear))
+        viewModel.send(.onDisappear)
         XCTAssertTrue(task.isCancelled)
         await repository.finish(1, .success(makePost()))
         await task.value
-        XCTAssertNil(vm.state.post)
-        XCTAssertEqual(vm.state.loadState, .idle)
+        XCTAssertNil(viewModel.state.post)
+        XCTAssertEqual(viewModel.state.loadState, .idle)
     }
 
     func testRoutesUseLoadedAuthorAndRequestedPostID() async {
         let router = DetailTestRouter()
-        let vm = PostDetailViewModel(postID: "post", repository: DetailTestRepository(result: .success(makePost())),
-                                     bookmarksStorage: DetailTestBookmarks(), router: router)
-        await vm.send(.onAppear)?.value
-        vm.send(.didSelectAuthor)
-        vm.send(.didSelectComments)
+        let viewModel = PostDetailViewModel(
+            postID: "post",
+            repository: DetailTestRepository(result: .success(makePost())),
+            bookmarksStorage: DetailTestBookmarks(),
+            router: router
+        )
+        await viewModel.send(.onAppear)?.value
+        viewModel.send(.didSelectAuthor)
+        viewModel.send(.didSelectComments)
         XCTAssertEqual(router.authorID, "author")
         XCTAssertEqual(router.username, "username")
         XCTAssertEqual(router.commentsID, "post")
@@ -148,21 +155,27 @@ final class PostDetailViewModelTests: XCTestCase {
     func testReturningReconcilesBookmarkChangesWithoutRefetchingArticle() async {
         let repository = DetailTestRepository(result: .success(makePost()))
         let storage = DetailTestBookmarks()
-        let vm = makeViewModel(repository, storage)
-        await vm.send(.onAppear)?.value
-        vm.send(.onDisappear)
+        let viewModel = makeViewModel(repository, storage)
+        await viewModel.send(.onAppear)?.value
+        viewModel.send(.onDisappear)
         try? await storage.save(post: makePost())
-        await vm.send(.onAppear)?.value
-        XCTAssertTrue(vm.state.isBookmarked)
+        await viewModel.send(.onAppear)?.value
+        XCTAssertTrue(viewModel.state.isBookmarked)
         let count = await repository.count
         XCTAssertEqual(count, 1)
     }
 
-    private func makeViewModel(_ repository: DetailTestRepository, _ storage: any BookmarksStorage) -> PostDetailViewModel {
+    private func makeViewModel(
+        _ repository: DetailTestRepository,
+        _ storage: any BookmarksStorage
+    ) -> PostDetailViewModel {
         PostDetailViewModel(postID: "post", repository: repository, bookmarksStorage: storage, router: nil)
     }
 
-    private func makePost(title: String = "Article", body: String? = "# Heading\n\n```swift\nlet value = 1\n```") -> PostModel {
+    private func makePost(
+        title: String = "Article",
+        body: String? = "# Heading\n\n```swift\nlet value = 1\n```"
+    ) -> PostModel {
         PostModel(id: "post", title: title, summary: "Summary", bodyMarkdown: body,
                   publishedAt: .distantPast, coverImageURL: nil, readingTimeMinutes: 3,
                   reactionsCount: 2, commentsCount: 1, tags: ["swift"],

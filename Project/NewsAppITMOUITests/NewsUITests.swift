@@ -1,5 +1,7 @@
 import XCTest
 
+// UI scenarios intentionally live together so the host application is launched consistently.
+// swiftlint:disable type_body_length
 @MainActor
 final class NewsUITests: XCTestCase {
     private var app: XCUIApplication!
@@ -162,7 +164,10 @@ final class NewsUITests: XCTestCase {
         scrollTo(author)
         author.tap()
         XCTAssertTrue(app.staticTexts["author-profile-name"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Статья автора 2")).firstMatch.waitForExistence(timeout: 5))
+        let authorPost = app.buttons
+            .matching(NSPredicate(format: "label CONTAINS %@", "Статья автора 2"))
+            .firstMatch
+        XCTAssertTrue(authorPost.waitForExistence(timeout: 5))
         app.navigationBars["Автор"].buttons.firstMatch.tap()
         XCTAssertTrue(app.staticTexts["post-detail-title"].waitForExistence(timeout: 5))
     }
@@ -380,3 +385,4 @@ final class NewsUITests: XCTestCase {
         XCTAssertTrue(detail.waitForNonExistence(timeout: 5))
     }
 }
+// swiftlint:enable type_body_length
